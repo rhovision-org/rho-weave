@@ -1,88 +1,58 @@
 # Rho Weave
 
-**What should a system do when it does not know enough?**
+The first ticket went out. Its reply never came back.
 
-[![CI](https://github.com/rhovision-org/rho-weave/actions/workflows/ci.yml/badge.svg)](https://github.com/rhovision-org/rho-weave/actions/workflows/ci.yml) [![Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+The clerk still needs to finish issuing the tickets. From outside the contract, the missing reply leaves more than one possible state. I built Weave to turn those possibilities into a checked decision and, for supported compiled contracts, into recovery code that can act on it.
 
-Created by **[AixAria](https://github.com/aixaria0)** ([@aixaria0](https://github.com/aixaria0)).
+Created by [AixAria](https://github.com/aixaria0).
 
-You send a request. Nothing comes back.
+Forge and Foundry can supply the rules that drive a recovery. Observer helps the application pin a separate read to one block. [Where the inputs come from](#where-the-inputs-come-from)
 
-Maybe it never arrived. Maybe it is waiting. Maybe the operation finished and only the reply was lost. From your side, all three look the same.
+![The reply to ticket 1 disappears. Weave's generated controller reads one issued and two held, issues tickets 2 and 3 at the expected revisions, and returns DONE.](docs/motion/overview.gif)
 
-In a distributed system, choosing the wrong explanation can be worse than waiting.
+[Static storyboard](docs/motion/overview.png) · [Text walkthrough](docs/motion/README.md)
 
-Rho Weave is my attempt to turn that uncertainty into something we can work with. Instead of writing a recovery branch for one assumed state, describe the possible states, actions and outcomes. Weave searches for a safe strategy that reaches your stated goal across those possibilities.
+## Finish the reservation
 
-![A tangled set of unknown possibilities becomes an observation-dependent decision tree](docs/motion/overview.gif)
+In the native Rholo example, the clerk holds all three seats and issues the first. The demo discards the issuance reply. The generated controller reads the actor at revision 2, sees one issued and two held, and issues the remaining two. At revision 4 the actor has issued all three. Try the same recovery with the manager's capability and it returns `DEFER`.
 
-[Still image](docs/motion/overview.png) · [How the animation was made](docs/motion/README.md)
+The developer specifies possible starting counts, observable counts, a goal and allowed actions. Weave gets the role's actual transitions from the actor manifest. The controller checks the new state and revision after each step. That keeps the recovery implementation tied to the contract's rules as they evolve. [Native walkthrough](docs/RECOVERY.md) · [Recorded run](https://github.com/rhovision-org/rho-weave/actions/runs/45809327924)
 
-## What comes out?
+### Build the controller
 
-A decision policy, not just a warning.
-
-For example, a recovery model inspired by Quantum OS starts with an unknown remote status. The synthesized first action is to refresh. If the response says prepared, committed or absent, different recommendations follow. If the retry budget is exhausted, the modeled policy defers.
-
-If no strategy can both stay safe and finish under the supplied rules, Weave returns `NO_POLICY`. It does not pretend uncertainty has gone away.
-
-Try this with the [RhoGov coherent-read model](examples/rhogov.json): Weave chooses to pin one finalized block and read at that same block, rather than combining values from two different snapshots.
-
-![Why anchoring reads matters](docs/images/coherent-read.svg)
-
-## A two-minute experiment
-
-Git and Python 3.10+ are enough. No blockchain node or Python packages are needed.
+Git and Python 3.10+ are enough for this part. Start in a directory for the two checkouts.
 
 ```sh
+git clone https://github.com/rhovision-org/rho-forge.git
 git clone https://github.com/rhovision-org/rho-weave.git
+(cd rho-forge && python3 -m rhoforge examples/venues.json --partition --out ../venues)
 cd rho-weave
-python3 -m rhoweave examples/quantum-os.json --output certificate.json --export policy.json
+python3 -m rhoweave.machine ../venues/manifest.json examples/venue-recovery.json \
+  --lane free_a --out recovery
+python3 -m rhoweave recovery/model.json --verify recovery/certificate.json
 ```
 
-The supplied example returns WIN with a worst-case bound of two decisions. You get a certificate and a policy table that can be used with the included JavaScript monitor. Replay a case where the status remains unknown:
+Expect `WIN`. Open `recovery/model.json` to see the derived problem and `recovery/policy.json` to see the portable decisions. The certificate can be checked separately, and `recovery/recovery.rho` is the executable controller. For Rholo, give it the view and operation capabilities from the same Forge lane instance. [Objective format, invocation and native reproduction](docs/RECOVERY.md)
 
-```sh
-python3 -m rhoweave examples/quantum-os.json --verify certificate.json --trace examples/quantum-os-trace.json
-```
+Try a copy of the objective with `"observe": []`, then point the compiler at the copy and use a new output directory. It returns `NO_POLICY` and writes the checked model and certificate. Without the counts, the controller cannot distinguish a state where it should issue a ticket from one where it must reserve first. [Example objective](examples/venue-recovery.json)
 
-Try the opposite: a model with an indefinite partition and no permissible defer.
+## What a policy can promise
 
-```sh
-python3 -m rhoweave examples/partition.json
-```
+Weave groups possible states by what the caller can see. A group of states consistent with an observation is a *belief*. An action has to work from every state in the belief, and every modeled outcome has to preserve safety and make progress toward the goal. The certificate checker can reproduce those obligations. The solve, check and export path shares one construction of the reachable graph, down from three.
 
-It returns NO_POLICY (exit code 1). A resource limit instead produces UNKNOWN; the two results mean different things.
+You can also supply your own finite model. The Quantum OS recovery example starts with several possible remote statuses. It admits a refresh first and can defer when the model's retry budget expires. An exhausted search budget returns `UNKNOWN`. A checked model is valuable within its supplied observations, actions and failure assumptions. At runtime a stale revision or unexpected reply can stop the controller. [Policy and formats](docs/POLICY.md) · [Manual model walkthrough](docs/GUIDE.md)
 
-## For people building protocols
+A portable policy can be used by the Python or JavaScript monitor. To generate a model directly from source, the separate Rholang fragment compiler supports a restricted one-shot fragment. [Fragment compiler](docs/COMPILER.md) · [Runtime evidence](docs/RUNTIME.md) · [Security](SECURITY.md)
 
-### Resume an interrupted reservation
+## Where the inputs come from
 
-Compile a Forge workflow or an enumerated Foundry contract. Give Weave its machine artifact and describe the possible starting markings, the goal, the observations and the allowed operations. Weave derives the model and generates a recovery controller in Rholang.
+![Forge and enumerated Foundry feed Weave's Rholang recovery compiler. Observer provides a separate input to a by-hash read adapter.](docs/images/ecosystem.svg)
 
-The [reservation demo](docs/RECOVERY.md) recovers after an issuance reply is lost. The controller reads the actor, chooses its next authorized operation and advances only on the expected reply and revision. A request through the wrong capability defers. The example runs against a pinned native Rholo node.
+[Forge](https://github.com/rhovision-org/rho-forge) supplies flat actor manifests or a selected lane of a partitioned manifest. [Foundry](https://github.com/rhovision-org/rho-foundry) supplies an enumerated state-and-rule table. Its symbolic backend produces an arithmetic contract with a different machine format, so use the enumerated backend when you want Weave recovery. [Supported artifact interfaces](docs/ECOSYSTEM.md)
 
-Weave tracks sets of states consistent with the visible observations. It constructs the reachable belief graph, then solves a finite robust reachability game. Each admitted action reduces the worst-case remaining decision count, and a separate certificate checker verifies the graph and rank calculation.
+[Observer](https://github.com/rhovision-org/rho-observer) can supply a finalized anchor when your application needs an external read. The optional adapter checks freshness and requires the response to match that block. Your application provides the trusted read callback. Recovery still uses the actor's capabilities and revision. [Observer adapter](docs/POLICY.md#observer-read-anchors)
 
-It can also compile a restricted one-shot Rholang fragment into a model. The Python and JavaScript monitors check policy admission; they do not execute network actions. Included adapters demonstrate coherent reads and recovery recommendations.
-
-The modeled decision can be safe while a real implementation is still unsafe. The model must cover relevant failures; observations and side effects remain the caller's responsibility. A recovery recommendation is not settlement.
-
-- [Full walkthrough and JavaScript example](docs/GUIDE.md)
-- [Model format and solver](docs/POLICY.md)
-- [Rholang fragment compiler](docs/COMPILER.md)
-- [Native Rholo reproduction](docs/RUNTIME.md)
-- [Security boundaries](SECURITY.md)
-
-Recorded evidence includes 300 randomized solver comparisons and 50 sampled native Rholo executions across ten closed-fragment fixtures. The [raw observations](evidence/rholo-runtime-probes.json) are included. This is bounded validation, not a proof for arbitrary Rholang or arbitrary networks. [CI](https://github.com/rhovision-org/rho-weave/actions) reports the latest offline checks.
-
-## The Rho family
-
-- **[Rho Observer](https://github.com/rhovision-org/rho-observer)** — See what the network actually reports.
-- **[Rho Forge](https://github.com/rhovision-org/rho-forge)** — Turn resource flows into executable actors.
-- **[Rho Foundry](https://github.com/rhovision-org/rho-foundry)** — Turn guarded rules into executable contracts.
-
-Weave derives policies from Forge and enumerated Foundry artifacts. Observer supplies a block anchor to applications that read external state by hash. Each tool also runs independently. [How the projects fit together](docs/ECOSYSTEM.md)
+[Repository structure and contributions](docs/DEVELOPMENT.md) · [CI](https://github.com/rhovision-org/rho-weave/actions)
 
 ## License
 
