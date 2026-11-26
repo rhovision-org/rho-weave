@@ -6,13 +6,15 @@ The clerk still needs to finish issuing the tickets. From outside the contract, 
 
 Created by [AixAria](https://github.com/aixaria0).
 
+Forge and Foundry can supply the rules that drive a recovery. Observer helps the application pin a separate read to one block. [Where the inputs come from](#where-the-inputs-come-from)
+
 ![The reply to ticket 1 disappears. Weave's generated controller reads one issued and two held, issues tickets 2 and 3 at the expected revisions, and returns DONE.](docs/motion/overview.gif)
 
 [Static storyboard](docs/motion/overview.png) · [Text walkthrough](docs/motion/README.md)
 
 ## Finish the reservation
 
-The native Rholo example starts inside a three-seat actor. All three seats are held and the first issuance has happened. The demo discards that reply. The generated controller reads the actor at revision 2, sees one issued and two held, and issues the remaining two. At revision 4 the actor has issued all three. Try the same recovery with the manager's capability and it returns `DEFER`.
+In the native Rholo example, the clerk holds all three seats and issues the first. The demo discards the issuance reply. The generated controller reads the actor at revision 2, sees one issued and two held, and issues the remaining two. At revision 4 the actor has issued all three. Try the same recovery with the manager's capability and it returns `DEFER`.
 
 The developer specifies possible starting counts, observable counts, a goal and allowed actions. Weave gets the role's actual transitions from the actor manifest. The controller checks the new state and revision after each step. That keeps the recovery implementation tied to the contract's rules as they evolve. [Native walkthrough](docs/RECOVERY.md) · [Recorded run](https://github.com/rhovision-org/rho-weave/actions/runs/45809327924)
 
