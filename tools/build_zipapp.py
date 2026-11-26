@@ -19,6 +19,9 @@ elif len(sys.argv)>1 and sys.argv[1]=="audit":
     del sys.argv[1]
     from rhoweave.recovery import main
     sys.exit(main())
+elif len(sys.argv)>1 and sys.argv[1]=="machine":
+    from rhoweave.machine import main
+    sys.exit(main(sys.argv[2:]))
 else:
     from rhoweave.__main__ import main
     sys.exit(main())

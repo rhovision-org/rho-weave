@@ -42,6 +42,12 @@ The application must authenticate observations, serialize side effects, enforce 
 
 The optional anchoredRead adapter requires a verified finalized hash, genesis and trusted by-hash transport. It rejects malformed responses and does not fall back to another block. recommendPreparedRecovery requires an authoritative status provider and produces a recommendation rather than a transaction. See [SECURITY.md](../SECURITY.md).
 
+### Observer read anchors
+
+`rhoweave.anchor.anchored_read` accepts a fetch callback for Observer's read-anchor envelope and a by-hash callback. Supply the expected network and shard plus your own maximum sample age. The adapter checks the service freshness threshold, complete source coverage, the caller's age limit including both callbacks, and the response binding to the chosen block hash. The callback returns a mapping with `network_id`, `shard_id`, `block_hash` and `value`.
+
+Use authenticated transports. The caller supplies any independent validation of chain identity, data and external effects. A valid older anchor may still be stale relative to an actor's current revision. [Full reservation demo](RECOVERY.md)
+
 ## Other inputs
 
 The [finite Rholang fragment](COMPILER.md) has a separate source compiler. The optional TypeScript auditor supports a particular literal recovery switch, not arbitrary TypeScript.

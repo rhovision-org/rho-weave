@@ -29,3 +29,60 @@ jobs:
           echo '5eed654a8912fc28058749b7c544eaa85ba95c243b95b9ccd8539770d543b80a  qos-pinned.ts' | sha256sum -c
           python rho-weave.pyz audit qos-pinned.ts examples/quantum-os.json > qos-audit.json
           diff -u evidence/quantum-os-source-audit.json qos-audit.json
+  native-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: rhovision-org/rho-forge
+          ref: 7b06bd2d0d46933627e533e22d605ccf2b839397
+          path: .integration/forge
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: rhovision-org/rho-foundry
+          ref: ed61d48b239e3f30320cfc1490a85f525220bbf3
+          path: .integration/foundry
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: rhovision-org/rho-observer
+          ref: 6f90588d87e143f104acc47746bee1ac7a63d4ea
+          path: .integration/observer
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: .integration/observer
+      - name: Build the pinned Observer
+        run: cargo build --locked --manifest-path .integration/observer/Cargo.toml
+      - name: Fetch and verify pinned public Rholo binary
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .integration/rholo
+          gh api repos/rhovision-org/rholo/actions/artifacts/14977847392/zip > .integration/rholo.zip
+          echo 'f2ecced8a2b085183654828e1061f67469b95e225f1ae8ce022ea8fd9a5167e1  .integration/rholo.zip' | sha256sum -c
+          unzip -q .integration/rholo.zip -d .integration/rholo
+          chmod 700 .integration/rholo/rnode
+      - name: Generate and execute reservation recovery
+        run: |
+          PYTHONPATH=. python tools/demo_recovery.py \
+            --forge .integration/forge --foundry .integration/foundry \
+            --observer .integration/observer/target/debug/rchain-observer \
+            --rholo .integration/rholo/rnode --out recovery-native.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rho-reservation-recovery-native
+          path: recovery-native.json
+          if-no-files-found: error

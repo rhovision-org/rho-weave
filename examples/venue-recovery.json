@@ -1,0 +1,9 @@
+{
+  "name": "finish_issuing_seats",
+  "role": "clerk",
+  "initial": [{"issued_a": 0}, {"issued_a": 1}],
+  "goal": {"issued_a": 3},
+  "avoid": [],
+  "observe": ["held_a", "issued_a"],
+  "operations": ["reserve_a", "reserve_all_a", "issue_a"]
+}
