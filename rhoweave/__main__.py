@@ -11,7 +11,9 @@ def load(p):
             if k in d: raise ModelError('duplicate JSON key')
             d[k]=v
         return d
-    return json.loads(data,object_pairs_hook=unique)
+    def invalid_constant(value):
+        raise ModelError('non-finite JSON constant: '+value)
+    return json.loads(data,object_pairs_hook=unique,parse_constant=invalid_constant)
 def main():
     p=argparse.ArgumentParser(description='Compile a finite protocol into an observation-safe policy')
     p.add_argument('model'); p.add_argument('--output'); p.add_argument('--export'); p.add_argument('--verify'); p.add_argument('--trace'); p.add_argument('--limit',type=int,default=10000)
@@ -23,7 +25,9 @@ def main():
         if a.export: Path(a.export).write_text(json.dumps(export_policy(m,c,a.limit),indent=2)+'\n')
         result={'status':c['status'],'beliefs':len(c['nodes']),'winning':sum(n['rank'] is not None for n in c['nodes']),'initial':[n for n in c['nodes'] if tuple(n['belief']) in m.partition(m.initial).values()]}
         if a.trace:
-            t=load(a.trace); s=Session(m,c,t['initial']); steps=[]
+            t=load(a.trace)
+            if not isinstance(t,dict) or set(t)!={'initial','steps'} or not isinstance(t['initial'],str) or not isinstance(t['steps'],list) or any(not isinstance(step,list) or len(step)!=2 or not all(isinstance(x,str) for x in step) for step in t['steps']): raise ModelError('invalid trace')
+            s=Session(m,c,t['initial']); steps=[]
             for action,obs in t['steps']:
                 steps.append({'allowed':s.allowed(),'action':action,'observed':obs}); s.step(action,obs)
             result['trace']={'steps':steps,'done':s.done,'allowed':s.allowed()}

@@ -5,14 +5,16 @@ test_denied (test_engine.Tests.test_denied) ... ok
 test_gov (test_engine.Tests.test_gov) ... ok
 test_limit (test_engine.Tests.test_limit) ... ok
 test_missing_action_in_hidden_state (test_engine.Tests.test_missing_action_in_hidden_state) ... ok
+test_model_input_is_copied (test_engine.Tests.test_model_input_is_copied) ... ok
 test_partition (test_engine.Tests.test_partition) ... ok
 test_qos (test_engine.Tests.test_qos) ... ok
 test_random_against_synchronous_reference (test_engine.Tests.test_random_against_synchronous_reference) ... ok
+test_session_copies_certificate_and_model (test_engine.Tests.test_session_copies_certificate_and_model) ... ok
 test_tamper (test_engine.Tests.test_tamper) ... ok
 test_timeout (test_engine.Tests.test_timeout) ... ok
 test_unexpected (test_engine.Tests.test_unexpected) ... ok
 
 ----------------------------------------------------------------------
-Ran 13 tests in 0.032s
+Ran 15 tests in 0.043s
 
 OK

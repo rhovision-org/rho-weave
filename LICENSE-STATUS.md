@@ -1,1 +1,1 @@
-Publication and licensing are pending owner/organization approval. No upstream source code is bundled. Do not publish or redistribute beyond authorized review until a license is selected.
+No open-source license has been selected. Publication for inspection does not grant a license to use, modify, or redistribute this code. License selection remains with the project owner. No upstream source code is included.

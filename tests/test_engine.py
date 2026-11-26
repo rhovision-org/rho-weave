@@ -44,4 +44,8 @@ class Tests(unittest.TestCase):
                     for d in m.outcomes(b)[a].values(): self.assertLess(entries[d]['rank'],n['rank']); self.assertTrue(m.safe(d))
     def test_missing_action_in_hidden_state(self):
         m=Model.parse({'name':'partial','states':{'a':{'observation':'x','safe':True,'goal':False},'b':{'observation':'x','safe':True,'goal':False},'g':{'observation':'g','safe':True,'goal':True}},'initial':['a','b'],'transitions':[['a','go','g']]}); self.assertEqual(synthesize(m)['status'],'NO_POLICY')
+    def test_model_input_is_copied(self):
+        raw=json.loads((BASE/'rhogov.json').read_text()); m=Model.parse(raw); raw['states'].clear(); self.assertEqual(synthesize(m)['status'],'WIN')
+    def test_session_copies_certificate_and_model(self):
+        m=model('rhogov'); c=synthesize(m); s=Session(m,c,'start'); c['nodes'].clear(); m.states.clear(); self.assertEqual(s.allowed(),['pin-finalized']); s.step('pin-finalized','pinned'); self.assertEqual(s.allowed(),['read-at-pin'])
 if __name__=='__main__': unittest.main()

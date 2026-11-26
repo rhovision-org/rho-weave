@@ -30,3 +30,7 @@ The solver uses a reverse hyperedge worklist, with a priority queue ordered by r
 ## Safe adoption
 
 Keep the existing repos unchanged. Run this standalone, review the model with maintainers, validate model-to-implementation correspondence on pinned isolated fixtures, then consider an explicitly approved adapter. The runtime does not execute network actions; it checks which named actions are permitted and advances on observations. A real caller must check admission **before** side effects, authenticate and bind observations, serialize execution, handle action failure, and model external interference. Do not use the monitor as a transaction engine or as a substitute for on-chain authorization. See SECURITY.md.
+
+## Release 0.1.1
+
+The Python monitor snapshots caller-owned inputs; the JS monitor validates table structure and descending ranks and supports SHA-256 artifact verification against an independently trusted digest. These checks do not authenticate the underlying model or observations. The project remains an offline bounded-model prototype, not a production transaction engine.

@@ -2,6 +2,7 @@ from __future__ import annotations
 from collections import defaultdict, deque
 from dataclasses import dataclass
 import hashlib, json
+from copy import deepcopy
 
 class ModelError(ValueError): pass
 class LimitError(ModelError): pass
@@ -23,7 +24,7 @@ class Model:
     def parse(cls, raw):
         if not isinstance(raw,dict) or set(raw)!={'name','states','initial','transitions'}: raise ModelError('expected name, states, initial, transitions')
         if not isinstance(raw['name'],str) or not raw['name']: raise ModelError('invalid name')
-        states=raw['states']; initial=raw['initial']; transitions=raw['transitions']
+        states=deepcopy(raw['states']); initial=raw['initial']; transitions=raw['transitions']
         if not isinstance(states,dict) or not 0<len(states)<=MAX_STATES: raise ModelError('invalid state count')
         for s,p in states.items():
             if not isinstance(s,str) or not s or not isinstance(p,dict) or set(p)!={'observation','safe','goal'}: raise ModelError('invalid state')
@@ -125,7 +126,7 @@ def verify(m,cert,limit=MAX_BELIEFS):
 class Session:
     """Fail-closed monitor for a verified model-bound policy. No network I/O."""
     def __init__(self,m,cert,observation):
-        self.m=m; self.nodes=verify(m,cert); self.belief=m.partition(m.initial).get(observation); self.failed=False
+        self.m=deepcopy(m); self.nodes=verify(self.m,deepcopy(cert)); self.belief=self.m.partition(self.m.initial).get(observation); self.failed=False
         if self.belief is None or self.nodes[self.belief]['rank'] is None: raise ModelError('no winning initial belief')
     def allowed(self): return [] if self.failed else list(self.nodes[self.belief]['actions'])
     def step(self,action,observation):
