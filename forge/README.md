@@ -55,4 +55,8 @@ PYTHONPATH=. python tools/probe_generated.py --weave-root .. \
   --repeats 5 --output /tmp/forge-runtime.json
 ```
 
-Use the pinned Rholo artifact identified in the parent [runtime guide](../docs/RUNTIME.md). The compiler itself is standalone; only optional runtime reproduction uses the adjacent isolation harness. The actual runtime checks are bounded; real deployment, resource sizing/phlo, durable recovery, external state/asset effects, authorization and adversarial audits remain separate tasks. No production asset claims. No upstream changes or deployment required. License approval remains governed by the parent repository.
+Use the pinned Rholo artifact identified in the parent [runtime guide](../docs/RUNTIME.md). The compiler itself is standalone; only optional runtime reproduction uses the adjacent isolation harness. The actual runtime checks are bounded; real deployment, resource sizing/phlo, durable recovery, external state/asset effects, authorization and adversarial audits remain separate tasks. No production asset claims. No upstream changes or deployment required. See the parent repository for licensing.
+
+## License
+
+Rho Forge is covered by the parent repository's [Apache License 2.0](../LICENSE).

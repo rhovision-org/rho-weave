@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="410" viewBox="0 0 1080 410" role="img" aria-labelledby="title desc"><title id="title">Rho Weave: know less, decide safely</title><desc id="desc">Observations and hidden states enter a finite game solver that rejects unsafe outcomes and produces a checked decision policy.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#83d9c6"/></marker></defs>
+<rect x="1" y="1" width="1078" height="408" rx="20" fill="#142333" stroke="#394e62"/><g font-family="system-ui,Segoe UI,sans-serif">
+<text x="40" y="49" fill="#83d9c6" font-size="14" font-weight="700" text-anchor="start">R H O  /  W E A V E</text>
+<text x="40" y="91" fill="#eef4fa" font-size="34" font-weight="700" text-anchor="start">Know less. Decide safely.</text>
+<text x="40" y="122" fill="#b6c7d9" font-size="17" font-weight="400" text-anchor="start">A policy compiler for protocols that cannot see the whole system.</text>
+<rect x="40" y="158" width="270" height="184" rx="12" fill="#203344" stroke="#42586c"/>
+<text x="60" y="190" fill="#83d9c6" font-size="13" font-weight="700" text-anchor="start">01 / WHAT YOU KNOW</text>
+<text x="60" y="229" fill="#eef4fa" font-size="17" font-weight="400" text-anchor="start">Visible observations</text>
+<text x="60" y="264" fill="#eef4fa" font-size="17" font-weight="400" text-anchor="start">Possible hidden states</text>
+<text x="60" y="299" fill="#eef4fa" font-size="17" font-weight="400" text-anchor="start">Actions and outcomes</text>
+<rect x="358" y="158" width="364" height="184" rx="12" fill="#203b40" stroke="#83d9c6"/>
+<text x="378" y="190" fill="#83d9c6" font-size="13" font-weight="700" text-anchor="start">02 / WEAVE</text>
+<text x="378" y="229" fill="#eef4fa" font-size="17" font-weight="400" text-anchor="start">Explore possible beliefs</text>
+<text x="378" y="264" fill="#eef4fa" font-size="17" font-weight="400" text-anchor="start">Reject unsafe outcomes</text>
+<text x="378" y="299" fill="#eef4fa" font-size="17" font-weight="400" text-anchor="start">Solve shortest worst-case path</text>
+<rect x="770" y="158" width="270" height="184" rx="12" fill="#203344" stroke="#42586c"/>
+<text x="790" y="190" fill="#83d9c6" font-size="13" font-weight="700" text-anchor="start">03 / WHAT TO DO</text>
+<text x="790" y="229" fill="#eef4fa" font-size="17" font-weight="400" text-anchor="start">Checked policy table</text>
+<text x="790" y="264" fill="#eef4fa" font-size="17" font-weight="400" text-anchor="start">Python / JavaScript monitor</text>
+<text x="790" y="299" fill="#eef4fa" font-size="17" font-weight="400" text-anchor="start">Finite progress bound</text>
+<path d="M317 250L351 250" fill="none" stroke="#83d9c6" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M729 250L763 250" fill="none" stroke="#83d9c6" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="40" y="379" fill="#b6c7d9" font-size="15" font-weight="400" text-anchor="start">If no safe finite strategy exists in the model, Weave says NO_POLICY.</text>
+</g></svg>

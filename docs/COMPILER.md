@@ -20,7 +20,7 @@ A configuration is a multiset of pending one-shot receives and messages plus the
 
 The external controller observes only output counts and the action/observation history. Intermediate forbidden outputs cannot disappear because public output channels cannot be consumed. The game solver checks safety and finite progress to the declared terminal objective; it does not prove fairness or liveness for unbounded real execution. Source hash is included in the model name and the model certificate binds the generated graph.
 
-Limits: 64 KiB source, 128 instruction occurrences, 128 private binders, nesting 64, 32 public names, join width 32, input budgets 1–16 each and total 64, 100,000 internal reduction attempts, 256 compiled states, 20,000 transitions, and engine belief limits. An exhausted bound does not imply no policy. This fragment semantics has not been validated against the actual Rholo interpreter or proved equivalent to its runtime semantics.
+Limits: 64 KiB source, 128 instruction occurrences, 128 private binders, nesting 64, 32 public names, join width 32, input budgets 1–16 each and total 64, 100,000 internal reduction attempts, 256 compiled states, 20,000 transitions, and engine belief limits. An exhausted bound does not imply no policy. Ten closed-fragment fixtures were compared with the actual pinned Rholo interpreter, five runs each. All 50 observations belonged to the predicted sets. This is sampled agreement, not formal equivalence; see [runtime evidence](RUNTIME.md).
 
 ## Acceptance
 

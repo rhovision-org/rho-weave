@@ -1,1 +1,3 @@
-No open-source license has been selected. Publication for inspection does not grant a license to use, modify, or redistribute this code. License selection remains with the project owner. No upstream source code is included.
+# License
+
+Rho Weave and its included Rho Forge component are released under the [Apache License 2.0](LICENSE). External projects and runtime artifacts remain under their respective licenses.
