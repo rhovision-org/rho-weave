@@ -1,0 +1,81 @@
+{
+  "name": "RhoGov coherent decision read",
+  "states": {
+    "a": {
+      "observation": "start",
+      "safe": true,
+      "goal": false
+    },
+    "b": {
+      "observation": "start",
+      "safe": true,
+      "goal": false
+    },
+    "pa": {
+      "observation": "pinned",
+      "safe": true,
+      "goal": false
+    },
+    "pb": {
+      "observation": "pinned",
+      "safe": true,
+      "goal": false
+    },
+    "aa": {
+      "observation": "coherent",
+      "safe": true,
+      "goal": true
+    },
+    "bb": {
+      "observation": "coherent",
+      "safe": true,
+      "goal": true
+    },
+    "ab": {
+      "observation": "mixed",
+      "safe": false,
+      "goal": false
+    }
+  },
+  "initial": [
+    "a",
+    "b"
+  ],
+  "transitions": [
+    [
+      "a",
+      "read-latest",
+      "aa"
+    ],
+    [
+      "a",
+      "read-latest",
+      "ab"
+    ],
+    [
+      "b",
+      "read-latest",
+      "bb"
+    ],
+    [
+      "a",
+      "pin-finalized",
+      "pa"
+    ],
+    [
+      "b",
+      "pin-finalized",
+      "pb"
+    ],
+    [
+      "pa",
+      "read-at-pin",
+      "aa"
+    ],
+    [
+      "pb",
+      "read-at-pin",
+      "bb"
+    ]
+  ]
+}

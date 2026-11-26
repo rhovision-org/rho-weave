@@ -1,0 +1,203 @@
+{
+  "name": "Quantum OS ambiguous recovery observation",
+  "states": {
+    "unknown_absent": {
+      "observation": "unknown",
+      "safe": true,
+      "goal": false
+    },
+    "known_absent": {
+      "observation": "absent",
+      "safe": true,
+      "goal": false
+    },
+    "timeout_absent": {
+      "observation": "retry-exhausted",
+      "safe": true,
+      "goal": false
+    },
+    "decision_absent": {
+      "observation": "decision",
+      "safe": true,
+      "goal": true
+    },
+    "unknown_prepared": {
+      "observation": "unknown",
+      "safe": true,
+      "goal": false
+    },
+    "known_prepared": {
+      "observation": "prepared",
+      "safe": true,
+      "goal": false
+    },
+    "timeout_prepared": {
+      "observation": "retry-exhausted",
+      "safe": true,
+      "goal": false
+    },
+    "decision_prepared": {
+      "observation": "decision",
+      "safe": true,
+      "goal": true
+    },
+    "unknown_committed": {
+      "observation": "unknown",
+      "safe": true,
+      "goal": false
+    },
+    "known_committed": {
+      "observation": "committed",
+      "safe": true,
+      "goal": false
+    },
+    "timeout_committed": {
+      "observation": "retry-exhausted",
+      "safe": true,
+      "goal": false
+    },
+    "decision_committed": {
+      "observation": "decision",
+      "safe": true,
+      "goal": true
+    },
+    "unknown_aborted": {
+      "observation": "unknown",
+      "safe": true,
+      "goal": false
+    },
+    "known_aborted": {
+      "observation": "aborted",
+      "safe": true,
+      "goal": false
+    },
+    "timeout_aborted": {
+      "observation": "retry-exhausted",
+      "safe": true,
+      "goal": false
+    },
+    "decision_aborted": {
+      "observation": "decision",
+      "safe": true,
+      "goal": true
+    },
+    "deferred": {
+      "observation": "deferred",
+      "safe": true,
+      "goal": true
+    },
+    "unsafe": {
+      "observation": "unsafe",
+      "safe": false,
+      "goal": false
+    }
+  },
+  "initial": [
+    "unknown_absent",
+    "unknown_prepared",
+    "unknown_committed",
+    "unknown_aborted"
+  ],
+  "transitions": [
+    [
+      "unknown_absent",
+      "refresh",
+      "known_absent"
+    ],
+    [
+      "unknown_absent",
+      "refresh",
+      "timeout_absent"
+    ],
+    [
+      "timeout_absent",
+      "defer",
+      "deferred"
+    ],
+    [
+      "known_absent",
+      "abort-local",
+      "decision_absent"
+    ],
+    [
+      "unknown_absent",
+      "abort-local",
+      "decision_absent"
+    ],
+    [
+      "unknown_prepared",
+      "refresh",
+      "known_prepared"
+    ],
+    [
+      "unknown_prepared",
+      "refresh",
+      "timeout_prepared"
+    ],
+    [
+      "timeout_prepared",
+      "defer",
+      "deferred"
+    ],
+    [
+      "known_prepared",
+      "commit-both",
+      "decision_prepared"
+    ],
+    [
+      "unknown_prepared",
+      "abort-local",
+      "unsafe"
+    ],
+    [
+      "unknown_committed",
+      "refresh",
+      "known_committed"
+    ],
+    [
+      "unknown_committed",
+      "refresh",
+      "timeout_committed"
+    ],
+    [
+      "timeout_committed",
+      "defer",
+      "deferred"
+    ],
+    [
+      "known_committed",
+      "commit-local",
+      "decision_committed"
+    ],
+    [
+      "unknown_committed",
+      "abort-local",
+      "unsafe"
+    ],
+    [
+      "unknown_aborted",
+      "refresh",
+      "known_aborted"
+    ],
+    [
+      "unknown_aborted",
+      "refresh",
+      "timeout_aborted"
+    ],
+    [
+      "timeout_aborted",
+      "defer",
+      "deferred"
+    ],
+    [
+      "known_aborted",
+      "abort-local",
+      "decision_aborted"
+    ],
+    [
+      "unknown_aborted",
+      "abort-local",
+      "decision_aborted"
+    ]
+  ]
+}

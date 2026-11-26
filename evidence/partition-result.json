@@ -1,0 +1,15 @@
+{
+  "status": "NO_POLICY",
+  "beliefs": 3,
+  "winning": 1,
+  "initial": [
+    {
+      "belief": [
+        "a",
+        "b"
+      ],
+      "rank": null,
+      "actions": []
+    }
+  ]
+}

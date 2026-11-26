@@ -1,0 +1,61 @@
+{
+  "name": "Unbounded partition without defer",
+  "states": {
+    "a": {
+      "observation": "unknown",
+      "safe": true,
+      "goal": false
+    },
+    "b": {
+      "observation": "unknown",
+      "safe": true,
+      "goal": false
+    },
+    "ok": {
+      "observation": "done",
+      "safe": true,
+      "goal": true
+    },
+    "bad": {
+      "observation": "bad",
+      "safe": false,
+      "goal": false
+    }
+  },
+  "initial": [
+    "a",
+    "b"
+  ],
+  "transitions": [
+    [
+      "a",
+      "retry",
+      "a"
+    ],
+    [
+      "b",
+      "retry",
+      "b"
+    ],
+    [
+      "a",
+      "abort",
+      "ok"
+    ],
+    [
+      "b",
+      "abort",
+      "bad"
+    ],
+    [
+      "a",
+      "commit",
+      "bad"
+    ],
+    [
+      "b",
+      "commit",
+      "ok"
+    ]
+  ]
+}

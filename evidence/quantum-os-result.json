@@ -1,0 +1,19 @@
+{
+  "status": "WIN",
+  "beliefs": 13,
+  "winning": 12,
+  "initial": [
+    {
+      "belief": [
+        "unknown_aborted",
+        "unknown_absent",
+        "unknown_committed",
+        "unknown_prepared"
+      ],
+      "rank": 2,
+      "actions": [
+        "refresh"
+      ]
+    }
+  ]
+}

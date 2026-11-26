@@ -1,0 +1,13 @@
+{
+  "initial": "start",
+  "steps": [
+    [
+      "pin-finalized",
+      "pinned"
+    ],
+    [
+      "read-at-pin",
+      "coherent"
+    ]
+  ]
+}

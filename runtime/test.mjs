@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {PolicySession} from './policy.mjs';
+const table=JSON.parse(readFileSync(process.argv[2],'utf8'));
+const s=new PolicySession(table,'unknown',table.model_sha256);
+assert.deepEqual(s.allowed(),['refresh']);
+assert.throws(()=>s.step('abort-local','decision'));
+s.step('refresh','committed'); assert.deepEqual(s.allowed(),['commit-local']);
+s.step('commit-local','decision'); assert.equal(s.done,true);
+const t=new PolicySession(table,'unknown',table.model_sha256); assert.throws(()=>t.step('refresh','unexpected')); assert.deepEqual(t.allowed(),[]);
+assert.throws(()=>new PolicySession(table,'unknown','wrong-hash'));
+console.log('JavaScript runtime: assertions passed');

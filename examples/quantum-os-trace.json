@@ -1,0 +1,13 @@
+{
+  "initial": "unknown",
+  "steps": [
+    [
+      "refresh",
+      "retry-exhausted"
+    ],
+    [
+      "defer",
+      "deferred"
+    ]
+  ]
+}

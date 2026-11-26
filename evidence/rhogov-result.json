@@ -1,0 +1,37 @@
+{
+  "status": "WIN",
+  "beliefs": 4,
+  "winning": 3,
+  "initial": [
+    {
+      "belief": [
+        "a",
+        "b"
+      ],
+      "rank": 2,
+      "actions": [
+        "pin-finalized"
+      ]
+    }
+  ],
+  "trace": {
+    "steps": [
+      {
+        "allowed": [
+          "pin-finalized"
+        ],
+        "action": "pin-finalized",
+        "observed": "pinned"
+      },
+      {
+        "allowed": [
+          "read-at-pin"
+        ],
+        "action": "read-at-pin",
+        "observed": "coherent"
+      }
+    ],
+    "done": true,
+    "allowed": []
+  }
+}
