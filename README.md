@@ -6,6 +6,10 @@
 
 ![Rho Weave: know less, decide safely](docs/images/weave.svg)
 
+![Animated Weave overview](docs/motion/overview.gif)
+
+[Static version](docs/motion/overview.png) · [Motion source](docs/motion/README.md)
+
 ## Why I built this
 
 A distributed system rarely knows everything about itself. A message may arrive late. A node may become unreachable. Two requests that look perfectly reasonable on their own may return data from different moments in time.
@@ -34,6 +38,19 @@ Weave considers the situations that are still possible, examines the actions ava
 Sometimes the answer is to gather more information. Sometimes there is an action that works in every possible situation. Sometimes no safe finite strategy exists.
 
 Weave tells you which of those cases you are dealing with, within the model you provide.
+
+## What it adds
+
+A conventional recovery branch often chooses an action using the latest visible status. Weave makes the hidden possibilities explicit. It asks whether the same action is available and safe in every situation still consistent with the observation.
+
+| Before | With a reviewed Weave model |
+| --- | --- |
+| One assumed remote status | A set of possible concrete states |
+| Hand-written recovery branches | Synthesized observation-dependent actions |
+| Retry with no progress argument | A finite worst-case action bound, or NO_POLICY |
+| Informal policy table | Certificate checked against the supplied model |
+
+A model can still be wrong or incomplete. The guarantee is about the supplied finite model, not the entire network.
 
 ## Example 1 — reading a changing blockchain
 
@@ -327,16 +344,22 @@ A reproducible model and the expected result are a good starting point for a con
 
 ## The Rho project family
 
-Four independent tools exploring different parts of building on RhoVision: observing a system, deciding under uncertainty, and generating executable contracts.
+The four projects share an idea: make the parts of engineering that can be expressed precisely easier to inspect, reuse and execute. They are independent tools, not four stages of a mandatory runtime stack.
 
-| Project | What it does |
-| --- | --- |
-| [Rho Observer](https://github.com/rhovision-org/rho-observer) | Read-only network observations, coverage and evidence. |
-| **Rho Weave (you are here)** | Checked decision policies under partial information. |
-| [Rho Forge](https://github.com/rhovision-org/rho-forge) | Generate actors from resource-flow and conservation rules. |
-| [Rho Foundry](https://github.com/rhovision-org/rho-foundry) | Generate contracts from integer resources, guards and goals. |
+| Project | Focus | Capability |
+| --- | --- | --- |
+| [Rho Observer](https://github.com/rhovision-org/rho-observer) | Read-only evidence | Compare configured endpoints and keep missing or conflicting evidence visible. |
+| **Rho Weave (you are here)** | Decision policies | Synthesize safe finite strategies when observations leave several states possible. |
+| [Rho Forge](https://github.com/rhovision-org/rho-forge) | Resource-flow actors | Generate Rholang actors from consumption, production, conservation and role-specific missions. |
+| [Rho Foundry](https://github.com/rhovision-org/rho-foundry) | Guarded contracts | Generate Rholang factories from bounded integer resources, guards, invariants and goals. |
 
-These are complementary design directions, not an integrated runtime pipeline. Forge and Foundry have overlapping but distinct specification formats and actor interfaces. No project requires the others to run.
+### How they relate
+
+Weave does not create new contract state machines. It builds a policy for a supplied model of an uncertain protocol. Observer can supply network evidence to a future application adapter, but its reports must be authenticated and explicitly mapped to model observations. Forge and Foundry can generate the finite internal contract logic that an application might call.
+
+Weave does not automatically infer a correct game from those contracts, translate Observer reports or execute a recommended transaction.
+
+For a concrete example of how a developer could combine the ideas, see [the ecosystem guide](docs/ECOSYSTEM.md). The examples are architectural illustrations, not claims of an existing integrated deployment.
 
 ## License
 
