@@ -13,6 +13,17 @@ node runtime/test.mjs policy.json
 
 Python 3.10+, Node 18+ for the optional JS runtime. No installation dependencies or network requests. `WIN` exits 0, `NO_POLICY` exits 1, `UNKNOWN` (resource limit) and `ERROR` (invalid input) exit 2. Model and trace input limit 4 MB; certificate input and artifact output limit 64 MB. Artifact writes are atomic and reject output/input path aliasing. Run only in a disposable directory for untrusted models.
 
+## Rho Forge — generate the contract itself
+
+[Rho Forge](forge/README.md) is a resource-workflow compiler, not another monitor. Describe bounded resources, invariants, roles, transitions and mission goals in JSON. Forge enumerates the reachable markings, synthesizes shortest authorized plans and emits an executable Rholang factory with fresh per-instance capabilities and revision-checked atomic state transitions.
+
+```sh
+cd forge
+python -m rhoforge examples/escrow.json --out build-escrow
+```
+
+Inspect the [generated Rholang actor](forge/examples/generated/factory.rho) and [machine-readable plans](forge/examples/generated/manifest.json). The synthetic escrow example reduces a four-step funding/reservation mission to one actor operation. 151 concrete exploratory executions on pinned Rholo matched the model, including 126 state/role/action cases and repeated concurrency/instance-isolation cases. No live network deployment or financial custody is claimed. See the Forge documentation for the finite model and runtime trust boundaries.
+
 ## Why RhoVision
 
 Two source-grounded boundary problems: RhoGov's pinned read client uses a short cached tip and fallback; Quantum OS's recovery decision table conflates missing and unreachable remote legs. The models demonstrate automated policy construction, not merely identification of failing cases. The RhoGov example finds a two-operation coherent read strategy; the Quantum OS example selects a safe recovery recommendation after bounded re-observation, or defers explicitly. The third example demonstrates infeasibility under an unlimited partition with no permissible defer.
