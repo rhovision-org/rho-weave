@@ -27,7 +27,9 @@ PYTHONPATH=. python3 tools/demo_recovery.py --forge ../rho-forge \
 
 The cold actor reserves all three seats and issues them. In the lost-reply case the first issuance has already committed inside the exploratory term. The generated controller resumes at the next issuance. Both scenarios finish with three issued seats. The same controller invoked with the manager's capability defers. Removing the observations from the objective produces `NO_POLICY` and no executable controller.
 
-Add `--foundry ../rho-foundry` at the revision pinned in CI to run the same construction on a guarded enumerated contract. Add `--observer /path/to/rchain-observer` to select the read anchor with Observer. CI runs both options. Its two local observation routes expose one isolated Rholo node. This exercises the integration contract and one-node execution. The node's block height stays fixed throughout.
+Add `--foundry ../rho-foundry` at the revision pinned in CI to run the same construction on a guarded enumerated contract. Add `--observer /path/to/rchain-observer` to exercise the missing-finality boundary. CI runs both options. The native terms run at the standalone node's explicit exploration checkpoint. Two local read routes expose that same node to Observer, which returns HTTP 503 because the node has no finalized block to report. Weave's read adapter refuses to run a callback on that evidence. The node's block height stays fixed throughout.
+
+Rholo documents the distinction between exploratory genesis and finalized block reads in its [pinned block API implementation](https://github.com/rhovision-org/rholo/blob/e63b7e5a8ccfcc25ff64860ac989d95a748eaaca/casper/src/api/block_api_impl.rs#L169).
 
 ## Define a recovery objective
 

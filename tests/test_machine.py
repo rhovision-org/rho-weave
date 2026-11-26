@@ -118,3 +118,8 @@ class AnchoredReads(unittest.TestCase):
         with patch("rhoweave.anchor.monotonic_ns", side_effect=[0, 1, 1_000_000_000]):
             with self.assertRaisesRegex(engine.ModelError, "freshness expired"):
                 self.read(lambda a: {**self.evidence["anchor"], "value": []})
+
+    def test_freshness_budget_includes_rounding(self):
+        self.evidence["snapshot_age_ms"] = 999
+        with self.assertRaisesRegex(engine.ModelError, "freshness expired"):
+            self.read(lambda a: self.fail("read used the sample's rounding margin"))

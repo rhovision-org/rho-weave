@@ -47,7 +47,8 @@ def anchored_read(fetch_evidence, read_by_hash, *, network, shard, max_age_ms):
         or HEX.fullmatch(detail["block_hash"]) is None):
         raise ModelError("anchor does not match expected network, shard or block identity")
     anchor = ReadAnchor(network, shard, detail["block_number"], detail["block_hash"], report["evidence"])
-    budget_ns = (min(max_age_ms, stale_after) - age) * 1_000_000
+    # Observer reports whole milliseconds rounded down.
+    budget_ns = (min(max_age_ms, stale_after) - age - 1) * 1_000_000
     if monotonic_ns() - start >= budget_ns:
         raise ModelError("read anchor freshness expired")
     reply = read_by_hash(anchor)
