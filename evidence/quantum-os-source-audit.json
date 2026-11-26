@@ -1,0 +1,46 @@
+{
+  "checked_pairs": 16,
+  "model_counterexamples": [
+    {
+      "state": "unknown_committed",
+      "target": "unsafe"
+    },
+    {
+      "state": "unknown_prepared",
+      "target": "unsafe"
+    }
+  ],
+  "model_sha256": "3352aec4c24bc9f93d7657ec4aedfb44e73723f44d8ec1f764b3e8ad1ae7b3c8",
+  "permitted_actions": [
+    "refresh"
+  ],
+  "source_sha256": "5eed654a8912fc28058749b7c544eaa85ba95c243b95b9ccd8539770d543b80a",
+  "status": "MODEL_CONFLICT",
+  "table": {
+    "aborted": {
+      "aborted": "noop",
+      "committed": "inconsistent",
+      "prepared": "abort-remote",
+      "unknown": "noop"
+    },
+    "committed": {
+      "aborted": "inconsistent",
+      "committed": "noop",
+      "prepared": "commit-remote",
+      "unknown": "inconsistent"
+    },
+    "prepared": {
+      "aborted": "abort-local",
+      "committed": "commit-local",
+      "prepared": "commit-both",
+      "unknown": "abort-local"
+    },
+    "unknown": {
+      "aborted": "noop",
+      "committed": "noop",
+      "prepared": "noop",
+      "unknown": "noop"
+    }
+  },
+  "upstream_action": "abort-local"
+}

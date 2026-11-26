@@ -1,0 +1,9 @@
+// The premature read races with the pin receiver.
+// A one-shot input starts each externally controlled operation.
+new pin in {
+  for (_ <- @"pin") { pin!(Nil) } |
+  for (_ <- @"read") {
+    for (_ <- pin) { @"coherent"!(Nil) }
+  } |
+  for (_ <- @"unsafe_read") { @"mixed"!(Nil) }
+}

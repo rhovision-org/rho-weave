@@ -1,10 +1,12 @@
-import argparse,json,sys
+import argparse,json,sys,os,tempfile
 from pathlib import Path
 from .engine import Model,ModelError,LimitError,synthesize,verify,Session,export_policy
 
-def load(p):
-    with open(p,'rb') as f: data=f.read(4_000_001)
-    if len(data)>4_000_000: raise LimitError('input exceeds 4 MB')
+MAX_ARTIFACT=64_000_000
+
+def load(p,limit=4_000_000):
+    with open(p,'rb') as f: data=f.read(limit+1)
+    if len(data)>limit: raise LimitError('input exceeds byte budget')
     def unique(pairs):
         d={}
         for k,v in pairs:
@@ -14,15 +16,33 @@ def load(p):
     def invalid_constant(value):
         raise ModelError('non-finite JSON constant: '+value)
     return json.loads(data,object_pairs_hook=unique,parse_constant=invalid_constant)
+def atomic_json(path,value,limit=MAX_ARTIFACT):
+    path=Path(path)
+    tmp=None
+    try:
+        with tempfile.NamedTemporaryFile(mode="wb",dir=path.parent,prefix=".weave-",delete=False) as f:
+            tmp=Path(f.name); size=0
+            for chunk in json.JSONEncoder(indent=2).iterencode(value):
+                encoded=chunk.encode("utf-8"); size+=len(encoded)
+                if size+1>limit: raise LimitError("output exceeds byte budget")
+                f.write(encoded)
+            f.write(b"\n"); f.flush(); os.fsync(f.fileno())
+        os.replace(tmp,path)
+    finally:
+        if tmp is not None and tmp.exists(): tmp.unlink()
+
 def main():
     p=argparse.ArgumentParser(description='Compile a finite protocol into an observation-safe policy')
     p.add_argument('model'); p.add_argument('--output'); p.add_argument('--export'); p.add_argument('--verify'); p.add_argument('--trace'); p.add_argument('--limit',type=int,default=10000)
     a=p.parse_args()
     try:
         if not 1<=a.limit<=10000: raise ModelError('limit must be 1..10000')
-        m=Model.parse(load(a.model)); c=load(a.verify) if a.verify else synthesize(m,a.limit); verify(m,c,a.limit)
-        if a.output: Path(a.output).write_text(json.dumps(c,indent=2)+'\n')
-        if a.export: Path(a.export).write_text(json.dumps(export_policy(m,c,a.limit),indent=2)+'\n')
+        inputs={Path(v).resolve() for v in (a.model,a.verify,a.trace) if v}
+        outputs=[Path(v).resolve() for v in (a.output,a.export) if v]
+        if len(set(outputs))!=len(outputs) or inputs.intersection(outputs): raise ModelError("output aliases another path")
+        m=Model.parse(load(a.model)); c=load(a.verify,MAX_ARTIFACT) if a.verify else synthesize(m,a.limit); verify(m,c,a.limit)
+        if a.output: atomic_json(a.output,c)
+        if a.export: atomic_json(a.export,export_policy(m,c,a.limit))
         result={'status':c['status'],'beliefs':len(c['nodes']),'winning':sum(n['rank'] is not None for n in c['nodes']),'initial':[n for n in c['nodes'] if tuple(n['belief']) in m.partition(m.initial).values()]}
         if a.trace:
             t=load(a.trace)

@@ -11,13 +11,13 @@ python3 -m unittest discover -s tests -v
 node runtime/test.mjs policy.json
 ```
 
-Python 3.10+, Node 18+ for the optional JS runtime. No installation dependencies or network requests. `WIN` exits 0, `NO_POLICY` exits 1, `UNKNOWN` (resource limit) and `ERROR` (invalid input) exit 2. CLI input limit 4 MB; large generated tables may exceed the verification CLI's input limit. Run only in a disposable directory for untrusted models.
+Python 3.10+, Node 18+ for the optional JS runtime. No installation dependencies or network requests. `WIN` exits 0, `NO_POLICY` exits 1, `UNKNOWN` (resource limit) and `ERROR` (invalid input) exit 2. Model and trace input limit 4 MB; certificate input and artifact output limit 64 MB. Artifact writes are atomic and reject output/input path aliasing. Run only in a disposable directory for untrusted models.
 
 ## Why RhoVision
 
 Two source-grounded boundary problems: RhoGov's pinned read client uses a short cached tip and fallback; Quantum OS's recovery decision table conflates missing and unreachable remote legs. The models demonstrate automated policy construction, not merely identification of failing cases. The RhoGov example finds a two-operation coherent read strategy; the Quantum OS example selects a safe recovery recommendation after bounded re-observation, or defers explicitly. The third example demonstrates infeasibility under an unlimited partition with no permissible defer.
 
-See [source anchors and limitations](evidence/SOURCE.md). Models are manually authored abstractions, not extracted from Rholang or TypeScript, and have not been validated against a live deployment. No claim of global novelty, superiority over established game solvers, actual project schedule savings, or production readiness is made. This is an executable research prototype.
+See [source anchors and limitations](evidence/SOURCE.md). The original examples are manually authored abstractions. Version 0.2 adds a finite Rholang fragment compiler, a literal TypeScript recovery-table extractor, and offline boundary adapters. No live deployment has been validated. No claim of global novelty, superiority over established game solvers, actual project schedule savings, or production readiness is made. This is an executable research prototype.
 
 ## Input and semantics
 
@@ -34,3 +34,38 @@ Keep the existing repos unchanged. Run this standalone, review the model with ma
 ## Release 0.1.1
 
 The Python monitor snapshots caller-owned inputs; the JS monitor validates table structure and descending ranks and supports SHA-256 artifact verification against an independently trusted digest. These checks do not authenticate the underlying model or observations. The project remains an offline bounded-model prototype, not a production transaction engine.
+
+## Release 0.2.0 — executable boundary integration
+
+### Compile a finite Rholang fragment
+
+```sh
+python -m rhoweave.rholang examples/coherent-read.rho \
+  --input pin --input read --input unsafe_read \
+  --goal coherent --forbid mixed --output compiled.json
+python -m rhoweave compiled.json --output cert.json --export policy.json
+```
+
+The compiler translates a closed recursion-free process fragment into a finite observation game. It explores all maximal internal communication reductions between one-shot external input injections, rather than assuming a particular receive schedule. Supported syntax: one outer `new`, parallel composition, `Nil`, sends carrying `Nil`, one-shot wildcard receives, static private channels and literal public input/output names. Public output channels are write-only; a forbidden output cannot be hidden by later consumption. Goals are terminal once all declared goal outputs appear. Private names are local to the source; no external messages other than declared injections are modeled. This is an explicit finite abstraction, not the complete Rholang language or a verified equivalent of the Rholo interpreter. Unsupported syntax fails closed; limits return UNKNOWN. See [compiler contract](docs/COMPILER.md).
+
+### Audit the pinned Quantum OS recovery table
+
+```sh
+# Obtain this public source by immutable revision, outside the project tree:
+gh api 'repos/rhovision-org/quantum-os/contents/packages/browser/src/exchange-2pc.ts?ref=4d3e73b1f7d5ffe0c98b1b1c65a17c9937589948' --jq .content | base64 -d > ../qos-pinned.ts
+python -m rhoweave.recovery ../qos-pinned.ts examples/quantum-os.json
+```
+
+The auditor reads the supported literal switch structure without executing TypeScript. All 16 status pairs are extracted; the pinned source recommends abort-local for (prepared, unknown), which conflicts with two states in the supplied model. The result is a model-relative counterexample, not a demonstrated live exploit or proof that a transaction can reach these states. The extracted table and hashes are in [evidence](evidence/quantum-os-source-audit.json).
+
+### Use the policy at a client boundary
+
+`runtime/adapters.mjs` exports `anchoredRead` (same finalized hash for all reads, no fallback) and `recommendPreparedRecovery` (refresh and produce a recommendation, never execute settlement). These accept a caller-provided transport/status provider and trusted policy table. They perform no networking/signing themselves. Finality, chain identity, observation authentication, and deadlines are caller/transport obligations.
+
+```sh
+python -m rhoweave examples/rhogov.json --export gov-policy.json
+python -m rhoweave examples/quantum-os.json --export qos-policy.json
+node runtime/test-adapters.mjs gov-policy.json qos-policy.json
+```
+
+The reference tests use controlled in-process transports. No live-network access, upstream writes, or claims of full protocol verification. The supported envelope remains offline finite-model synthesis and checked client recommendations.

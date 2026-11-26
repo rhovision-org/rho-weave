@@ -17,3 +17,7 @@ jobs:
       - run: python -m rhoweave examples/quantum-os.json --output cert.json --export policy.json
       - run: python -m rhoweave examples/quantum-os.json --verify cert.json
       - run: node runtime/test.mjs policy.json
+      - run: python -m rhoweave.rholang examples/coherent-read.rho --input pin --input read --input unsafe_read --goal coherent --forbid mixed --output compiled.json
+      - run: python -m rhoweave compiled.json
+      - run: python -m rhoweave examples/rhogov.json --export gov-policy.json
+      - run: node runtime/test-adapters.mjs gov-policy.json policy.json
