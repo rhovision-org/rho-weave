@@ -36,7 +36,7 @@ class RholangTests(unittest.TestCase):
             run('for (_ <- @"bad") { @"ok"!(Nil) }',[],["ok"],["bad"])
 
     def test_unsupported_syntax(self):
-        for src in ('contract x(@v) = { Nil }','@"ok"!(42)','x!(Nil)','new x in { new y in { Nil } }','for (v <- @"start") { @"ok"!(Nil) }'):
+        for src in ('contract x(@v) = { Nil }','@"ok"!(42)','x!(Nil)','for (v <- @"start") { @"ok"!(Nil) }'):
             with self.subTest(src=src), self.assertRaises(ModelError):
                 run(src,["start"],["ok"],[])
 
@@ -45,6 +45,37 @@ class RholangTests(unittest.TestCase):
         a=compile_source(src,["go"],["ok"],[])
         self.assertEqual(a,compile_source(src,["go"],["ok"],[]))
         self.assertNotEqual(Model.parse(a).digest,Model.parse(compile_source(src+" // comment",["go"],["ok"],[])).digest)
+
+    def test_atomic_join_requires_both_inputs(self):
+        m,c=run('for (_ <- @"a"; _ <- @"b") { @"ok"!(Nil) }',["a","b"],["ok"],[])
+        self.assertEqual(c["status"],"WIN")
+        s=Session(m,c,next(iter(m.partition(m.initial))))
+        for a in ("a","b"):
+            s.step(a,next(iter(m.outcomes(s.belief)[a])))
+        self.assertTrue(s.done)
+
+    def test_repeated_channel_join_consumes_two_messages(self):
+        src='for (_ <- @"go"; _ <- @"go") { @"ok"!(Nil) }'
+        m,c=run(src,["go"],["ok"],[])
+        self.assertEqual(c["status"],"NO_POLICY")
+        m=Model.parse(compile_source(src,["go"],["ok"],[],{"go":2}))
+        c=synthesize(m);verify(m,c)
+        self.assertEqual(c["status"],"WIN")
+        s=Session(m,c,next(iter(m.partition(m.initial))))
+        for _ in range(2):
+            s.step("go",next(iter(m.outcomes(s.belief)["go"])))
+        self.assertTrue(s.done)
+
+    def test_nested_fresh_names_are_distinct(self):
+        src='new x in { x!(Nil) | new x in { for (_ <- x) { @"bad"!(Nil) } } | for (_ <- x) { @"ok"!(Nil) } }'
+        m,c=run(src,[],["ok"],["bad"])
+        self.assertEqual(c["status"],"WIN")
+
+    def test_join_races_with_single_receive(self):
+        src='new x,y in { x!(Nil) | y!(Nil) | for (_ <- x; _ <- y) { @"ok"!(Nil) } | for (_ <- x) { @"bad"!(Nil) } }'
+        m,c=run(src,[],["ok"],["bad"])
+        self.assertEqual(c["status"],"NO_POLICY")
+        self.assertEqual(len(m.initial),2)
 
     def test_one_shot_inputs(self):
         m,c=run('for (_ <- @"go") { for (_ <- @"go") { @"ok"!(Nil) } }',["go"],["ok"],[])

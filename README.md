@@ -46,7 +46,7 @@ python -m rhoweave.rholang examples/coherent-read.rho \
 python -m rhoweave compiled.json --output cert.json --export policy.json
 ```
 
-The compiler translates a closed recursion-free process fragment into a finite observation game. It explores all maximal internal communication reductions between one-shot external input injections, rather than assuming a particular receive schedule. Supported syntax: one outer `new`, parallel composition, `Nil`, sends carrying `Nil`, one-shot wildcard receives, static private channels and literal public input/output names. Public output channels are write-only; a forbidden output cannot be hidden by later consumption. Goals are terminal once all declared goal outputs appear. Private names are local to the source; no external messages other than declared injections are modeled. This is an explicit finite abstraction, not the complete Rholang language or a verified equivalent of the Rholo interpreter. Unsupported syntax fails closed; limits return UNKNOWN. See [compiler contract](docs/COMPILER.md).
+The compiler translates a closed recursion-free process fragment into a finite observation game. It explores all maximal internal communication reductions between bounded external input injections (default once per channel), rather than assuming a particular receive schedule. Supported syntax: lexically scoped `new`, parallel composition, `Nil`, sends carrying `Nil`, one-shot wildcard receives and atomic joins, private channels and literal public input/output names. Public output channels are write-only; a forbidden output cannot be hidden by later consumption. Goals are terminal once all declared goal outputs appear. Private names are local to the source; no external messages other than declared injections are modeled. This is an explicit finite abstraction, not the complete Rholang language or a verified equivalent of the Rholo interpreter. Unsupported syntax fails closed; limits return UNKNOWN. See [compiler contract](docs/COMPILER.md).
 
 ### Audit the pinned Quantum OS recovery table
 
@@ -69,3 +69,24 @@ node runtime/test-adapters.mjs gov-policy.json qos-policy.json
 ```
 
 The reference tests use controlled in-process transports. No live-network access, upstream writes, or claims of full protocol verification. The supported envelope remains offline finite-model synthesis and checked client recommendations.
+
+## Release 0.3.0
+
+The compiler now supports nested fresh-name scopes, atomic joins and explicit finite input budgets. Join semantics are guided by the pinned [Rholo join documentation](https://github.com/rhovision-org/rholo/blob/4a8500c2250dcff465ba1cd5d3675fd168827466/docs/src/rholang/joins-concurrency.md); this is not a claim of interpreter equivalence. Example:
+
+```rho
+for (_ <- @"go"; _ <- @"go") { @"ok"!(Nil) }
+```
+
+Compile with `--input go --budget go=2 --goal ok` to permit two injections. A single injection cannot satisfy the join. Each receive remains one-shot.
+
+### Portable distribution
+
+```sh
+python tools/build_zipapp.py rho-weave.pyz
+python rho-weave.pyz --version
+python rho-weave.pyz examples/rhogov.json
+python rho-weave.pyz compile examples/coherent-read.rho --input pin --input read --input unsafe_read --goal coherent --forbid mixed --output compiled.json
+```
+
+The standalone Python zipapp uses only the standard library. Builds are deterministic, and the CLI can run outside the checkout. CI also verifies the pinned Quantum OS source digest and static extraction. No arbitrary upstream program is executed.

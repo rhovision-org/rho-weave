@@ -6,8 +6,10 @@ Version 0.1.1 defensively copies caller-supplied Python monitor inputs and check
 
 ## 0.2.0 additions
 
-The source compiler accepts a deliberately restricted grammar and never executes source files. The public input is injected only at quiescence and at most once; internal communication is exhaustively enumerated up to a bounded reduction budget. This does not establish correspondence with an unrestricted Rholang program or the Rholo VM. Do not silently translate unsupported syntax.
+The source compiler accepts a deliberately restricted grammar and never executes source files. The public input is injected only at quiescence and within the configured finite injection budget; internal communication is exhaustively enumerated up to a bounded reduction budget. This does not establish correspondence with an unrestricted Rholang program or the Rholo VM. Do not silently translate unsupported syntax.
 
 The recovery auditor parses one supported literal function shape, not general TypeScript. Do not treat its output as an authenticated source attestation. Pin the exact source revision and verify its digest separately. The included client adapters trust the supplied table, finality anchor and transport; they do not verify on-chain proofs, authenticate network responses, enforce network deadlines or execute transactions. Inconsistent/unknown results are rejected or deferred, never labeled settled. Use an independently reviewed model and trusted transport before operational adoption.
 
 Output artifacts have a 64 MB ceiling and are committed with an atomic same-directory replacement. This does not make concurrent multi-artifact publication transactional. Resource limits are explicit; users should still apply process isolation for untrusted models.
+
+Version 0.3 includes a deterministic standard-library zipapp; artifact reproducibility does not establish publisher authenticity. Nested fresh names and atomic joins remain within the one-shot finite fragment. No unbounded or live network guarantee is claimed.

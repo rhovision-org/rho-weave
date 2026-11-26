@@ -84,7 +84,7 @@ def audit(source, model):
     return {"source_sha256":hashlib.sha256(source.encode()).hexdigest(),"model_sha256":m.digest,
             "table":table,"checked_pairs":16,"upstream_action":action,
             "permitted_actions":allowed,"model_counterexamples":unsafe,
-            "status":"MODEL_CONFLICT" if unsafe else "NO_MODELED_CONFLICT"}
+            "status":"MODEL_CONFLICT" if unsafe else ("ACTION_NOT_ADMITTED" if action not in allowed else "ADMITTED_BY_MODEL")}
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
