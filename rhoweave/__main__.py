@@ -1,12 +1,15 @@
 import argparse,json,sys,os,tempfile
 from pathlib import Path
-from .engine import Model,ModelError,LimitError,synthesize,verify,Session,export_policy
+from .engine import Model,ModelError,LimitError,Session,prepare_policy
 
 MAX_ARTIFACT=64_000_000
 
 def load(p,limit=4_000_000):
     with open(p,'rb') as f: data=f.read(limit+1)
     if len(data)>limit: raise LimitError('input exceeds byte budget')
+    return parse_json(data)
+
+def parse_json(data):
     def unique(pairs):
         d={}
         for k,v in pairs:
@@ -40,9 +43,15 @@ def main():
         inputs={Path(v).resolve() for v in (a.model,a.verify,a.trace) if v}
         outputs=[Path(v).resolve() for v in (a.output,a.export) if v]
         if len(set(outputs))!=len(outputs) or inputs.intersection(outputs): raise ModelError("output aliases another path")
-        m=Model.parse(load(a.model)); c=load(a.verify,MAX_ARTIFACT) if a.verify else synthesize(m,a.limit); verify(m,c,a.limit)
+        m=Model.parse(load(a.model))
+        c, table = prepare_policy(
+            m, load(a.verify,MAX_ARTIFACT) if a.verify else None, a.limit, export=bool(a.export)
+        )
         if a.output: atomic_json(a.output,c)
-        if a.export: atomic_json(a.export,export_policy(m,c,a.limit))
+        if a.export:
+            if table is None:
+                raise ModelError('cannot export losing initial policy')
+            atomic_json(a.export,table)
         result={'status':c['status'],'beliefs':len(c['nodes']),'winning':sum(n['rank'] is not None for n in c['nodes']),'initial':[n for n in c['nodes'] if tuple(n['belief']) in m.partition(m.initial).values()]}
         if a.trace:
             t=load(a.trace)

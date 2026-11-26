@@ -56,6 +56,12 @@ It returns NO_POLICY (exit code 1). A resource limit instead produces UNKNOWN; t
 
 ## For people building protocols
 
+### Resume an interrupted reservation
+
+Compile a Forge workflow or an enumerated Foundry contract. Give Weave its machine artifact and describe the possible starting markings, the goal, the observations and the allowed operations. Weave derives the model and generates a recovery controller in Rholang.
+
+The [reservation demo](docs/RECOVERY.md) recovers after an issuance reply is lost. The controller reads the actor, chooses its next authorized operation and advances only on the expected reply and revision. A request through the wrong capability defers. The example runs against a pinned native Rholo node.
+
 Weave tracks sets of states consistent with the visible observations. It constructs the reachable belief graph, then solves a finite robust reachability game. Each admitted action reduces the worst-case remaining decision count, and a separate certificate checker verifies the graph and rank calculation.
 
 It can also compile a restricted one-shot Rholang fragment into a model. The Python and JavaScript monitors check policy admission; they do not execute network actions. Included adapters demonstrate coherent reads and recovery recommendations.
@@ -76,9 +82,7 @@ Recorded evidence includes 300 randomized solver comparisons and 50 sampled nati
 - **[Rho Forge](https://github.com/rhovision-org/rho-forge)** — Turn resource flows into executable actors.
 - **[Rho Foundry](https://github.com/rhovision-org/rho-foundry)** — Turn guarded rules into executable contracts.
 
-Observer can provide evidence that an application maps into a reviewed Weave model. Forge and Foundry can generate the internal contracts that the application may call. Weave does not connect or execute those tools automatically.
-
-They share a direction, not an automatic integration. [See how the pieces could fit together](docs/ECOSYSTEM.md).
+Weave derives policies from Forge and enumerated Foundry artifacts. Observer supplies a block anchor to applications that read external state by hash. Each tool also runs independently. [How the projects fit together](docs/ECOSYSTEM.md)
 
 ## License
 

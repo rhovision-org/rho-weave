@@ -73,6 +73,9 @@ def graph(m,limit=MAX_BELIEFS):
 
 def synthesize(m,limit=MAX_BELIEFS):
     roots,edges=graph(m,limit)
+    return _solve(m, roots, edges)
+
+def _solve(m, roots, edges):
     # Least fixed point: guaranteed finite reachability of a safe goal, even
     # when the environment chooses any modeled outcome. No fairness assumed.
     ranks={b:0 for b in edges if m.goal(b) and m.safe(b)}
@@ -99,11 +102,18 @@ def synthesize(m,limit=MAX_BELIEFS):
         nodes.append({'belief':list(b),'rank':rank,'actions':permitted})
     return {'format':1,'model_sha256':m.digest,'status':'WIN' if all(b in ranks for b in roots.values()) else 'NO_POLICY','nodes':nodes}
 
+def _binding(m, cert):
+    if not isinstance(cert,dict) or set(cert)!={'format','model_sha256','status','nodes'} or type(cert['format']) is not int or cert['format']!=1 or cert['model_sha256']!=m.digest: raise ModelError('certificate binding mismatch')
+
 def verify(m,cert,limit=MAX_BELIEFS):
+    _binding(m, cert)
+    roots, edges = graph(m, limit)
+    return _check(m, cert, roots, edges)
+
+def _check(m, cert, roots, edges):
     # Check Bellman equations over full reachable graph, not solver history.
     # Positive ranks must descend. Null ranks must have no all-winning action.
-    if not isinstance(cert,dict) or set(cert)!={'format','model_sha256','status','nodes'} or type(cert['format']) is not int or cert['format']!=1 or cert['model_sha256']!=m.digest: raise ModelError('certificate binding mismatch')
-    roots,edges=graph(m,limit); entries={}
+    entries={}
     if not isinstance(cert['nodes'],list) or len(cert['nodes'])!=len(edges): raise ModelError('certificate coverage mismatch')
     for n in cert['nodes']:
         if not isinstance(n,dict) or set(n)!={'belief','rank','actions'} or not isinstance(n['belief'],list) or any(not isinstance(s,str) for s in n['belief']) or not isinstance(n['actions'],list) or any(not isinstance(a,str) for a in n['actions']): raise ModelError('malformed certificate node')
@@ -140,11 +150,27 @@ class Session:
 
 def export_policy(m,cert,limit=MAX_BELIEFS):
     """Portable runtime transition table from a checked winning certificate."""
-    entries=verify(m,cert,limit)
+    _binding(m, cert)
+    roots, edges = graph(m, limit)
+    entries = _check(m, cert, roots, edges)
     if cert['status']!='WIN': raise ModelError('cannot export losing initial policy')
+    return _export(m, entries, roots, edges)
+
+def _export(m, entries, roots, edges):
     ids={b:str(i) for i,b in enumerate(sorted(entries)) if entries[b]['rank'] is not None}
     nodes={}
     for b,i in ids.items():
-        n=entries[b]; outcomes=m.outcomes(b) if n['actions'] else {}
+        n=entries[b]; outcomes=edges[b]
         nodes[i]={'rank':n['rank'],'actions':{a:{o:ids[d] for o,d in outcomes[a].items()} for a in n['actions']}}
-    return {'format':1,'model_sha256':m.digest,'initial':{o:ids[b] for o,b in m.partition(m.initial).items()},'nodes':nodes}
+    return {'format':1,'model_sha256':m.digest,'initial':{o:ids[b] for o,b in roots.items()},'nodes':nodes}
+
+def prepare_policy(m, cert=None, limit=MAX_BELIEFS, *, export=False):
+    """Solve or check, and optionally export, using one reachable graph."""
+    if cert is not None:
+        _binding(m, cert)
+    roots, edges = graph(m, limit)
+    if cert is None:
+        cert = _solve(m, roots, edges)
+    entries = _check(m, cert, roots, edges)
+    table = _export(m, entries, roots, edges) if export and cert['status'] == 'WIN' else None
+    return cert, table

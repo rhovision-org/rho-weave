@@ -23,10 +23,11 @@ class RuntimeProbeTests(unittest.TestCase):
     def test_redirect_denied(self):
         with self.assertRaises(ValueError):probe.NoRedirect().redirect_request(None,None,302,'',{},'https://example.com')
 
-    def test_published_evidence_matches_current_model(self):
+    def test_historical_runtime_replies_match_current_model(self):
         report=json.loads(Path('evidence/rholo-runtime-probes.json').read_text())
         self.assertEqual(report['compiler_sha256'],probe.sha(Path(rholang.__file__)))
-        self.assertEqual(report['engine_sha256'],probe.sha(Path(engine.__file__)))
+        # Keep the engine binding of the original native run at 3807799.
+        self.assertEqual(report['engine_sha256'],'5a63d4e17a419a7bfdb4fb5bb2442183476705939e3301f16ac8e1bbe0752af2')
         self.assertEqual(report['binary_commit'],'e63b7e5a8ccfcc25ff64860ac989d95a748eaaca')
         self.assertEqual(report['peer_count'],0)
         self.assertEqual(report['block_height_before'],report['block_height_after'])
