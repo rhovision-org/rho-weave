@@ -264,38 +264,26 @@ python3 rho-weave.pyz examples/rhogov.json
 
 The zipapp contains the Python CLI and can run outside the checkout with a compatible Python interpreter.
 
-## Rho Forge — another part of the project
+## Rho Forge has moved
 
-The [Forge component](forge/README.md) approaches the problem from the other direction. Instead of generating a decision policy for an uncertain protocol, it generates a stateful Rholang actor from a finite resource workflow.
-
-```bash
-cd forge
-python3 -m rhoforge examples/escrow.json --out build-escrow
-cd ..
-```
-
-Its synthetic escrow example turns three funding steps and a reservation into a single buyer-authorized `open` operation. The seller's release remains a separate role capability. The generated [factory](forge/examples/generated/factory.rho) and [manifest](forge/examples/generated/manifest.json) are included in the repository.
-
-Forge and Weave are different components with separate validation suites. [Rho Foundry](https://github.com/rhovision-org/rho-foundry) is a related standalone project; it has its own specification format and runtime evidence.
+The resource-workflow compiler originally developed in this repository now lives in [Rho Forge](https://github.com/rhovision-org/rho-forge), with independent source, examples, runtime harness and CI. The original implementation and its evidence remain available in [this historical revision](https://github.com/rhovision-org/rho-weave/tree/cbfa663e94d86c20c8f23b49a753d6141b084f30/forge).
 
 ## What has actually been tested?
 
-![Recorded evidence for Weave and Forge](docs/images/validation.svg)
+![Recorded evidence for Weave](docs/images/validation.svg)
 
 | Check | Recorded result |
 | --- | --- |
 | Weave model solver | 300 seeded randomized comparisons with a reference solver |
 | Weave Rholang fragment | 50/50 sampled Rholo executions within predicted outcome sets |
-| Forge generated actor | 151/151 exploratory executions matching the reference interpreter |
-| Hosted offline CI | 3/3 Python matrix jobs passed, with JS and Forge checks |
+| Hosted offline CI | 3/3 Python matrix jobs passed, with JS checks |
 
-The runtime evidence comes from a pinned native Rholo binary, with synthetic keys in an isolated loopback-only devnet. Both recorded experiments had zero peers and unchanged block height. They did not execute signed transactions on an existing network.
+The runtime evidence comes from a pinned native Rholo binary, with synthetic keys in an isolated loopback-only devnet. The recorded Weave experiment had zero peers and unchanged block height. They did not execute signed transactions on an existing network.
 
 The hosted CI checks the recorded evidence and its consistency with the source; the native runtime probes are reproducible separately. The observations cover the recorded fixtures, not every scheduler outcome or arbitrary Rholang program.
 
 - [Successful hosted CI run](https://github.com/rhovision-org/rho-weave/actions/runs/45786310654)
 - [Weave runtime observations](evidence/rholo-runtime-probes.json)
-- [Forge runtime observations](forge/evidence/runtime.json)
 - [Native runtime reproduction guide](docs/RUNTIME.md)
 - [Pinned source comparisons](evidence/SOURCE.md)
 
@@ -327,7 +315,6 @@ At this stage, the project is an executable research tool with bounded runtime v
 | [rhoweave/](rhoweave/) | Solver, certificate checker, CLI and source compiler |
 | [examples/](examples/) | Protocol descriptions and sample observation traces |
 | [runtime/](runtime/) | JavaScript monitor, adapters and tests |
-| [forge/](forge/) | Resource-workflow compiler and generated actor |
 | [evidence/](evidence/) | Pinned source and runtime results |
 | [docs/](docs/) | Technical guides and illustrations |
 | [SECURITY.md](SECURITY.md) | Trust assumptions and operating boundaries |
@@ -338,8 +325,21 @@ If a protocol has a decision that is difficult to reason about, describe the pos
 
 A reproducible model and the expected result are a good starting point for a contribution.
 
+## The Rho project family
+
+Four independent tools exploring different parts of building on RhoVision: observing a system, deciding under uncertainty, and generating executable contracts.
+
+| Project | What it does |
+| --- | --- |
+| [Rho Observer](https://github.com/rhovision-org/rho-observer) | Read-only network observations, coverage and evidence. |
+| **Rho Weave (you are here)** | Checked decision policies under partial information. |
+| [Rho Forge](https://github.com/rhovision-org/rho-forge) | Generate actors from resource-flow and conservation rules. |
+| [Rho Foundry](https://github.com/rhovision-org/rho-foundry) | Generate contracts from integer resources, guards and goals. |
+
+These are complementary design directions, not an integrated runtime pipeline. Forge and Foundry have overlapping but distinct specification formats and actor interfaces. No project requires the others to run.
+
 ## License
 
-Rho Weave, including its Forge component, is released under the [Apache License 2.0](LICENSE).
+Rho Weave is released under the [Apache License 2.0](LICENSE).
 
 You can use, modify and redistribute the project under the terms of that license. External projects and runtime artifacts remain subject to their respective licenses.

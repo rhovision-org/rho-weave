@@ -1,3 +1,3 @@
 # License
 
-Rho Weave and its included Rho Forge component are released under the [Apache License 2.0](LICENSE). External projects and runtime artifacts remain under their respective licenses.
+Rho Weave are released under the [Apache License 2.0](LICENSE). External projects and runtime artifacts remain under their respective licenses.

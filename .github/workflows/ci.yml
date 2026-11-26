@@ -29,11 +29,3 @@ jobs:
           echo '5eed654a8912fc28058749b7c544eaa85ba95c243b95b9ccd8539770d543b80a  qos-pinned.ts' | sha256sum -c
           python rho-weave.pyz audit qos-pinned.ts examples/quantum-os.json > qos-audit.json
           diff -u evidence/quantum-os-source-audit.json qos-audit.json
-      - name: Compile Rho Forge resource workflows and check runtime evidence
-        working-directory: forge
-        run: |
-          python -m unittest discover -s tests -v
-          PYTHONPATH=. python tools/check_evidence.py
-          python -m rhoforge examples/escrow.json --out build-escrow
-          cmp examples/generated/factory.rho build-escrow/factory.rho
-          cmp examples/generated/manifest.json build-escrow/manifest.json

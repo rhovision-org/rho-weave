@@ -1,22 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="245" viewBox="0 0 1080 245" role="img" aria-labelledby="title desc"><title id="title">Recorded validation</title><desc id="desc">50 Weave and 151 Forge native Rholo exploratory executions matched their respective expectations. 300 randomized models compared, and 3 hosted CI jobs passed.</desc>
-<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#83d9c6"/></marker></defs>
-<rect x="1" y="1" width="1078" height="243" rx="20" fill="#142333" stroke="#394e62"/><g font-family="system-ui,Segoe UI,sans-serif">
-<text x="40" y="43" fill="#83d9c6" font-size="13" font-weight="700" text-anchor="start">RECORDED EVIDENCE / SEPARATE TEST SUITES</text>
-<rect x="40" y="65" width="240" height="126" rx="12" fill="#203344" stroke="#42586c"/>
-<text x="57" y="113" fill="#83d9c6" font-size="32" font-weight="700" text-anchor="start">50 / 50</text>
-<text x="57" y="143" fill="#eef4fa" font-size="16" font-weight="600" text-anchor="start">Weave Rholo probes</text>
-<text x="57" y="167" fill="#b6c7d9" font-size="12" font-weight="400" text-anchor="start">10 closed-fragment fixtures</text>
-<rect x="296" y="65" width="240" height="126" rx="12" fill="#203344" stroke="#42586c"/>
-<text x="313" y="113" fill="#83d9c6" font-size="32" font-weight="700" text-anchor="start">151 / 151</text>
-<text x="313" y="143" fill="#eef4fa" font-size="16" font-weight="600" text-anchor="start">Forge Rholo probes</text>
-<text x="313" y="167" fill="#b6c7d9" font-size="12" font-weight="400" text-anchor="start">Generated actor scenarios</text>
-<rect x="552" y="65" width="240" height="126" rx="12" fill="#203344" stroke="#42586c"/>
-<text x="569" y="113" fill="#83d9c6" font-size="32" font-weight="700" text-anchor="start">300</text>
-<text x="569" y="143" fill="#eef4fa" font-size="16" font-weight="600" text-anchor="start">Randomized models</text>
-<text x="569" y="167" fill="#b6c7d9" font-size="12" font-weight="400" text-anchor="start">Reference solver comparison</text>
-<rect x="808" y="65" width="232" height="126" rx="12" fill="#203344" stroke="#42586c"/>
-<text x="825" y="113" fill="#83d9c6" font-size="32" font-weight="700" text-anchor="start">3 / 3</text>
-<text x="825" y="143" fill="#eef4fa" font-size="16" font-weight="600" text-anchor="start">GitHub CI jobs</text>
-<text x="825" y="167" fill="#b6c7d9" font-size="12" font-weight="400" text-anchor="start">Python 3.10, 3.12, 3.13</text>
-<text x="40" y="221" fill="#b6c7d9" font-size="14" font-weight="400" text-anchor="start">Runtime samples are checked evidence, not a proof of equivalence to all Rholo executions.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="244" viewBox="0 0 1080 244" role="img" aria-labelledby="title desc">
+<title id="title">Recorded Weave validation</title><desc id="desc">50 of 50 Rholo observations matched predicted sets. 300 randomized models compared. Three GitHub CI jobs passed.</desc>
+<rect x="1" y="1" width="1078" height="242" rx="19" fill="#142333" stroke="#394e62"/>
+<g font-family="system-ui,Segoe UI,sans-serif">
+<text x="35" y="40" fill="#83d9c6" font-size="13" font-weight="700" letter-spacing="2">RECORDED / WEAVE VALIDATION</text>
+<g fill="#203344" stroke="#42586c"><rect x="35" y="63" width="327" height="125" rx="11"/><rect x="376" y="63" width="327" height="125" rx="11"/><rect x="717" y="63" width="328" height="125" rx="11"/></g>
+<g fill="#83d9c6" font-size="42" font-weight="700"><text x="55" y="120">50 / 50</text><text x="396" y="120">300</text><text x="737" y="120">3 / 3</text></g>
+<g fill="#edf3f8" font-size="17" font-weight="600"><text x="55" y="148">Rholo observations</text><text x="396" y="148">Randomized models</text><text x="737" y="148">Offline CI jobs passed</text></g>
+<g fill="#b6c7d9" font-size="13"><text x="55" y="169">10 closed-fragment fixtures</text><text x="396" y="169">Reference solver comparison</text><text x="737" y="169">Python 3.10, 3.12, 3.13</text></g>
+<text x="35" y="219" fill="#b6c7d9" font-size="13">Sampled runtime agreement, not a formal proof of equivalence.</text>
 </g></svg>
