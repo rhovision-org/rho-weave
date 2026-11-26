@@ -1,11 +1,15 @@
-# Motion graphics
+# A reply goes missing
 
-An illustrated example, not live telemetry. [Static image](overview.png).
+1. The clerk's first issuance has committed. The reply disappears on its way back.
+2. The generated recovery controller reads revision 2 and learns there is one issued ticket and two held.
+3. The clerk's policy admits the remaining issuances. At revision 4, all three tickets have been issued and the controller returns `DONE`.
 
-Regenerate with Python and Pillow in an isolated environment:
+The numbered stubs stand for internal seat units. The frames follow the lost-reply case in the native demo. [Static storyboard](overview.png) · [Recovery demo](../RECOVERY.md)
+
+Regenerate with Python, Pillow, fontconfig, Noto Serif Display and Liberation Sans.
 
 ```sh
-python docs/motion/render.py weave docs/motion /path/to/font-directory
+python3 docs/motion/render.py
 ```
 
-Fonts are selected from Roboto or DejaVu families, with serif and monospace alternatives when available. No font files are distributed. The animation generator is optional documentation tooling, not a product dependency.
+The command writes the GIF and the static PNG beside the renderer.

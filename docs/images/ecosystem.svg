@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="468" viewBox="0 0 768 468" role="img" aria-labelledby="heading description">
+  <title id="heading">How the four Rho projects connect</title>
+  <desc id="description">Forge's flat or partitioned actor manifest and Foundry's enumerated machine can feed Weave's verified policy and Rholang recovery controller. An application may separately use Observer's finalized read anchor through Weave's optional by-hash adapter. Foundry's symbolic output runs on its own.</desc>
+  <path d="M0 0h768v468H0z" fill="#f6f4ee"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="32" y="60" font-size="36" font-weight="750" fill="#252c2d">How the projects connect</text>
+    <path d="M32 80h704" stroke="#c8c3b9" stroke-width="1.5"/>
+    <g fill="#204638">
+      <path d="M34 121h40m-40 13h40m-40 13h40" stroke="#347962" stroke-width="2.2"/>
+      <circle cx="51" cy="121" r="4.5"/><circle cx="65" cy="134" r="4.5"/><circle cx="46" cy="147" r="4.5"/>
+      <text x="92" y="137" font-size="34" font-weight="750">Forge</text>
+      <text x="92" y="172" font-size="24">Actor manifest</text>
+    </g>
+    <g fill="#835538">
+      <path d="M429 119h20l-13 14 13 15h-20" fill="none" stroke="#a16b4c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="477" y="137" font-size="34" font-weight="750">Foundry</text>
+      <text x="477" y="172" font-size="24">Enumerated machine</text>
+    </g>
+    <path d="M158 190v26h150v28m266-54v26H459v28" fill="none" stroke="#696c62" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="m302 235 6 10 6-10m139 0 6 10 6-10" fill="none" stroke="#696c62" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M219 253h330q20 0 20 20v55H199v-55q0-20 20-20z" fill="#523750"/>
+    <text x="384" y="286" text-anchor="middle" font-size="31" font-weight="750" fill="#fff4eb">Weave</text>
+    <text x="384" y="315" text-anchor="middle" font-size="23" fill="#fff4eb">Checked Rholang recovery</text>
+    <path d="M32 351h704" stroke="#c8c3b9" stroke-width="1.5"/>
+    <g fill="#223c50">
+      <circle cx="52" cy="394" r="17" fill="none" stroke="#41627a" stroke-width="2"/>
+      <circle cx="52" cy="394" r="11" fill="none" stroke="#41627a" stroke-width="1"/>
+      <path d="m52 394 10-9" stroke="#41627a" stroke-width="2"/>
+      <circle cx="52" cy="394" r="3"/>
+      <text x="80" y="397" font-size="32" font-weight="750">Observer</text>
+      <text x="80" y="432" font-size="24">Finalized read anchor</text>
+    </g>
+    <path d="M339 409h110" stroke="#41627a" stroke-width="2.5" stroke-dasharray="6 7"/>
+    <path d="m444 403 9 6-9 6" fill="none" stroke="#41627a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <g fill="#223c50">
+      <text x="476" y="397" font-size="29" font-weight="750">App’s by-hash read</text>
+      <text x="476" y="432" font-size="24">Optional Weave adapter</text>
+    </g>
+  </g>
+</svg>
