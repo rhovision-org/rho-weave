@@ -1,115 +1,155 @@
-"""Reproducible illustrative README motion diagrams. No live data or network.
-Run with Pillow installed: python render.py PROJECT OUTPUT_DIRECTORY [FONT_DIRECTORY].
+"""Four illustrative motion designs. Python + Pillow; no product dependencies.
+python render.py observer|weave|forge|foundry OUTPUT_DIRECTORY [FONT_DIRECTORY]
 """
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
-import math,sys
-P=sys.argv[1]; out=Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True)
+import sys,math
+project=sys.argv[1];out=Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True)
 fontdir=Path(sys.argv[3] if len(sys.argv)>3 else '/system/fonts')
-font=next((x for x in [fontdir/'Roboto-Regular.ttf',fontdir/'DejaVuSans.ttf'] if x.exists()),None)
-if not font: raise SystemExit('Provide a font directory containing Roboto-Regular.ttf or DejaVuSans.ttf')
-W,H=1000,440
-BG='#101c2a'; CARD='#1b2b3d'; EDGE='#3d5265'; WHITE='#eff5fb'; MUTED='#a9bfd2'
-ACC={'observer':'#71e0d6','weave':'#b5a2ff','forge':'#f0b76e','foundry':'#83d9c6'}[P]
-def canvas(title,sub):
- im=Image.new('RGB',(W,H),BG);d=ImageDraw.Draw(im)
- d.rounded_rectangle((1,1,W-2,H-2),radius=22,outline=EDGE,width=2)
- txt(d,32,22,'R H O  /  '+P.upper(),15,ACC)
- txt(d,32,51,title,32,WHITE)
- txt(d,33,93,sub,16,MUTED)
- d.line((32,122,968,122),fill=EDGE,width=1)
- return im,d
-def txt(d,x,y,s,n=16,c=WHITE,anchor=None):
- d.text((x,y),s,font=ImageFont.truetype(str(font),n),fill=c,anchor=anchor)
-def box(d,x,y,w,h,title,sub='',active=False):
- d.rounded_rectangle((x,y,x+w,y+h),radius=12,fill=CARD,outline=ACC if active else EDGE,width=2)
- txt(d,x+w/2,y+22,title,18,WHITE,'mm')
- if sub:txt(d,x+w/2,y+48,sub,14,MUTED,'mm')
-def line(d,a,b,active=False):
- d.line((*a,*b),fill=ACC if active else EDGE,width=3 if active else 2)
-def dot(d,x,y,r=5,c=None):
- d.ellipse((x-r,y-r,x+r,y+r),fill=c or ACC)
-def pulse(d,a,b,t):
- t=max(0,min(1,t));dot(d,a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,5)
-def footer(d,step,description):
- d.line((32,380,968,380),fill=EDGE,width=1)
- txt(d,34,398,step,14,ACC)
- txt(d,185,398,description,14,MUTED)
-def observer(i):
- im,d=canvas('Read the network, not a single answer.','Illustrative polling cycle: comparable identities, coverage and evidence.')
- stage=i//12; frac=(i%12)/11
- sources=[(40,152),(40,226),(40,300)]
- for j,(x,y) in enumerate(sources):
-  box(d,x,y,184,58,'Endpoint '+chr(65+j),'hash H' if j<2 else ('timeout' if stage>=2 else 'pending'),stage>=1 and j<2)
-  line(d,(224,y+29),(390,251),stage>=1 and j<2)
-  if stage==0:pulse(d,(224,y+29),(390,251),frac)
-  elif stage==1 and j<2:pulse(d,(224,y+29),(390,251),frac)
- box(d,390,203,250,95,'Compare snapshots','network / shard / height / hash',stage>=1)
- line(d,(640,251),(720,251),stage>=2)
- if stage==2:pulse(d,(640,251),(720,251),frac)
- box(d,720,203,240,95,'Agreement' if stage>=2 else 'Evidence report','2 / 3 reachable' if stage>=2 else 'awaiting coverage',stage>=2)
- txt(d,840,322,'READINESS: NOT READY' if stage>=2 else 'Read-only sampling',15,'#f0b76e' if stage>=2 else MUTED,'mm')
- footer(d,['01 / POLL','02 / COMPARE','03 / REPORT','04 / INTERPRET'][stage],['Bounded requests to configured endpoints.','Two endpoints report the same finalized identity.','The third endpoint did not respond.','Agreement is not full coverage or consensus certification.'][stage])
+def fontfile(*names):
+ for n in names:
+  if (fontdir/n).is_file():return str(fontdir/n)
+ raise ValueError('Missing font: '+str(names))
+SANS=fontfile('Roboto-Regular.ttf','DejaVuSans.ttf')
+SERIF=fontfile('NotoSerif-Regular.ttf','DejaVuSerif.ttf','Roboto-Regular.ttf')
+MONO=fontfile('DroidSansMono.ttf','DejaVuSansMono.ttf','Roboto-Regular.ttf')
+from functools import lru_cache
+@lru_cache(None)
+def font(n,kind='sans'):return ImageFont.truetype({'sans':SANS,'serif':SERIF,'mono':MONO}[kind],n)
+def text(d,x,y,s,n=20,c='#ffffff',anchor=None,kind='sans'):
+ d.text((x,y),s,font=font(n,kind),fill=c,anchor=anchor)
+def circle(d,x,y,r,fill=None,outline=None,w=1):d.ellipse((x-r,y-r,x+r,y+r),fill=fill,outline=outline,width=w)
+def line(d,a,b,c,w=2):d.line((*a,*b),fill=c,width=w)
+def interpolate(a,b,t):return (a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t)
+def eased(t):return t*t*(3-2*t)
+def obs(i):
+ im=Image.new('RGB',(1000,440),'#071b25');d=ImageDraw.Draw(im)
+ for x in range(0,1000,32):line(d,(x,0),(x,440),'#0c2631',1)
+ for y in range(0,440,32):line(d,(0,y),(1000,y),'#0c2631',1)
+ cx,cy=244,230;active='#70f1c6';dim='#225464'
+ text(d,32,23,'RHO OBSERVER   /   FIELD NOTES',14,active,kind='mono')
+ for r in (45,91,137,181):circle(d,cx,cy,r,outline=dim)
+ for angle in range(0,360,45):
+  a=math.radians(angle);line(d,(cx,cy),(cx+181*math.cos(a),cy+181*math.sin(a)),dim,1)
+ angle=i*7.5-90
+ for j in range(16):
+  a=math.radians(angle-j*3);col=(18+j,65-j*2,66-j*2)
+  line(d,(cx,cy),(cx+180*math.cos(a),cy+180*math.sin(a)),col,3)
+ a=math.radians(angle);line(d,(cx,cy),(cx+180*math.cos(a),cy+180*math.sin(a)),active,2)
+ pts=[(166,124),(333,184),(273,377)]
+ for j,(x,y) in enumerate(pts):
+  c=active if j<2 and i>=8+j*6 else '#f2b15d' if j==2 and i>=26 else dim
+  circle(d,x,y,9,c);circle(d,x,y,16,outline=c)
+  text(d,x,y-26,chr(65+j),18,c,'mm','mono')
+ circle(d,cx,cy,7,active)
+ line(d,(465,42),(465,401),dim,1)
+ text(d,506,45,'Two answers.',40,'#e8f6f1')
+ text(d,506,92,'One missing.',40,'#e8f6f1')
+ text(d,509,161,'SOURCE       FINALIZED REPORT',14,'#789daa',kind='mono')
+ for j,name in enumerate(['A','B','C']):
+  y=199+j*43
+  state='hash H' if j<2 and i>=8+j*6 else 'timeout' if j==2 and i>=26 else 'waiting'
+  c=active if state=='hash H' else '#f2b15d' if state=='timeout' else '#789daa'
+  text(d,509,y,name,20,'#d4e3e8',kind='mono');text(d,653,y,state,20,c,kind='mono')
+  line(d,(508,y+30),(961,y+30),dim,1)
+ if i>=26:
+  text(d,509,346,'2 / 3 reachable',25,active)
+  text(d,509,382,'Agreement, but not ready.',23,'#f2b15d')
+ else:text(d,509,363,'Sampling configured endpoints...',19,'#789daa')
  return im
 def weave(i):
- im,d=canvas('A decision tree built from uncertainty.','Illustrative Quantum OS model: one hidden status, several possible realities.')
- stage=i//12;frac=(i%12)/11
- box(d,34,208,190,76,'Unknown','4 possible statuses',True)
- line(d,(224,246),(300,246),stage>=1)
- box(d,300,208,170,76,'Refresh','observe again',stage>=1)
- outcomes=[('Absent / aborted','abort-local'),('Prepared','commit-both'),('Committed','commit-local'),('Retry exhausted','defer')]
- for j,(obs,act) in enumerate(outcomes):
-  y=139+j*57
-  line(d,(470,246),(553,y+23),stage>=2)
-  box(d,553,y,190,48,obs,'',stage>=2)
-  line(d,(743,y+23),(785,y+23),stage>=3)
-  box(d,785,y,182,48,act,'',stage>=3)
-  if stage==2:pulse(d,(470,246),(553,y+23),frac)
- if stage==1:pulse(d,(224,246),(300,246),frac)
- footer(d,['01 / BELIEF','02 / OBSERVE','03 / BRANCH','04 / DECIDE'][stage],['Do not assume that silence means absence.','Refresh is the first allowed action in this model.','Each modeled observation selects a branch.','Reach a recommendation or defer; no settlement is performed.'][stage])
+ im=Image.new('RGB',(1000,440),'#f5f0e7');d=ImageDraw.Draw(im)
+ ink='#22213b';muted='#726c80';violet='#6846c2';pale='#ded5f1'
+ text(d,38,23,'RHO WEAVE',15,violet,kind='mono')
+ text(d,38,53,'Silence is not an answer.',35,ink,kind='serif')
+ text(d,40,105,'One missing response can hide very different situations.',17,muted)
+ # Tangled possibilities, then a single observation resolves the branching.
+ x0,y0=92,238;x1,y1=300,238
+ circle(d,x0,y0,44,'#e7def7');text(d,x0,y0,'?',48,violet,'mm','serif')
+ text(d,92,300,'unknown',16,muted,'mm')
+ for j in range(4):
+  points=[]
+  for k in range(31):
+   t=k/30;x=x0+44+(x1-x0-44)*t;y=y0+math.sin(t*math.pi)*(j-1.5)*39+math.sin(t*math.pi*2+i*.12+j)*5
+   points.append((x,y))
+  d.line(points,fill=violet if i<19 else pale,width=2)
+ d.rounded_rectangle((300,207,450,269),radius=31,fill=violet if i>=12 else pale)
+ text(d,375,238,'REFRESH',19,'#ffffff' if i>=12 else violet,'mm','mono')
+ branches=[('Absent / aborted','abort-local'),('Prepared','commit-both'),('Committed','commit-local'),('Timed out','defer')]
+ for j,(label,act) in enumerate(branches):
+  y=156+j*62
+  pts=[(450,238),(486,238),(530,y),(620,y)]
+  d.line(pts,fill=violet if i>=20+j*3 else pale,width=3)
+  if 20+j*3<=i<30+j*3:
+   p=interpolate((486,238),(530,y),min(1,(i-20-j*3)/8));circle(d,*p,5,violet)
+  text(d,532,y-25,label,15,ink if i>=20+j*3 else muted)
+  d.rounded_rectangle((658,y-19,961,y+23),radius=8,fill='#e5ddf5' if i>=30 else '#eee9df')
+  text(d,679,y+2,act if i>=30 else '...',21,violet,'lm','mono')
+ text(d,40,408,'A recommendation or an explicit defer. Never an assumed settlement.',17,muted)
  return im
 def forge(i):
- im,d=canvas('Conserve resources. Compose a mission.','Illustrative escrow marking: three funding actions and one reservation.')
- stage=i//8;frac=(i%8)/7
- for x,title,sub in [(55,'Buyer','credit'),(380,'Escrow','credit'),(705,'Reserved','item')]:
-  box(d,x,158,240,152,title,sub,stage>=4)
- # The counts move only at completed transition boundaries.
- count=min(stage,3)
- for k in range(3-count):dot(d,115+k*54,264,15,'#f0b76e')
- for k in range(count):dot(d,440+k*54,264,15,'#f0b76e')
- if stage<3:pulse(d,(285,237),(390,237),frac)
- if stage>=4:dot(d,825,264,19,'#f0b76e')
- else:
-  d.rounded_rectangle((806,245,844,283),radius=10,outline=EDGE,width=2)
- txt(d,825,330,'reserved' if stage>=4 else 'not reserved',15,ACC if stage>=4 else MUTED,'mm')
- txt(d,500,350,'buyer: open   |   4 primitive steps to 1 atomic update',19,ACC,'mm')
- footer(d,'MISSION / OPEN','Conceptual primitive path; the generated mission commits only its final marking.')
+ im=Image.new('RGB',(1000,440),'#f5e3c9');d=ImageDraw.Draw(im)
+ ink='#4a2b22';accent='#b65a24';steel='#7a4c35'
+ text(d,34,20,'RHO FORGE',15,accent,kind='mono')
+ text(d,34,46,'Nothing appears from nowhere.',34,ink,kind='serif')
+ text(d,35,93,'Three credits move; one item is reserved.',18,steel)
+ stage=min(i//9,4);frac=eased((i%9)/8)
+ # Conveyor with three physical token trays and a reservation latch.
+ d.rounded_rectangle((34,154,680,315),radius=20,fill='#e4c8a4',outline='#be906a',width=2)
+ d.rounded_rectangle((52,173,292,296),radius=16,fill='#fff3de',outline='#c69b75',width=2)
+ d.rounded_rectangle((422,173,662,296),radius=16,fill='#fff3de',outline='#c69b75',width=2)
+ text(d,172,196,'BUYER',18,ink,'mm','mono');text(d,542,196,'ESCROW',18,ink,'mm','mono')
+ d.rounded_rectangle((291,230,423,261),radius=12,fill='#c79b76')
+ for x in range(303,423,21):line(d,(x,235),(x+9,255),'#976849',2)
+ for j in range(3):
+  start=(108+j*63,246);end=(478+j*63,246)
+  t=1 if stage>j else frac if stage==j else 0
+  x,y=interpolate(start,end,t)
+  circle(d,x,y,23,'#ab4e1d');circle(d,x,y-3,20,'#e8a64c','#99501f',2);text(d,x,y-4,'1',19,ink,'mm','mono')
+ d.rounded_rectangle((716,154,963,315),radius=18,fill='#4a2b22')
+ text(d,839,184,'ITEM',17,'#f8e2bd','mm','mono')
+ lock=stage>=4
+ d.rounded_rectangle((790,225,888,283),radius=8,fill='#e8a64c' if lock else '#90664c')
+ d.arc((808,201 if lock else 188,870,252 if lock else 239),180,360,fill='#e8a64c' if lock else '#90664c',width=9)
+ text(d,839,299,'RESERVED' if lock else 'AVAILABLE',14,'#f8e2bd','mm','mono')
+ text(d,38,343,'3 credits. Always.',25,ink,kind='serif')
+ text(d,420,344,'open = fund + fund + fund + reserve',17,steel,kind='mono')
+ d.rectangle((35,389,965,393),fill='#d5b18b');d.rectangle((35,389,35+930*min(1,i/36),393),fill=accent)
+ text(d,35,407,'The illustrated primitive path becomes one internal atomic update.',16,steel)
  return im
 def foundry(i):
- im,d=canvas('From declared rules to executable contracts.','Illustrative compiler pipeline: constraints, reachable states and generated code.')
- stage=i//12;frac=(i%12)/11
- box(d,34,145,250,220,'Protocol specification','JSON',stage==0)
- for j,s in enumerate(['resources: 3 seats','roles: agent, customer','guarded integer deltas','free + held + sold = 3','goal: sellout']):
-  txt(d,52,215+j*26,s,15,WHITE if stage>=0 else MUTED)
- line(d,(284,254),(340,254),stage>=1)
- if stage==1:pulse(d,(284,254),(340,254),frac)
- pts=[(377,253),(450,177),(450,253),(450,329),(535,201),(535,305),(611,253)]
- for a,b in [(0,1),(0,2),(0,3),(1,4),(2,4),(2,5),(3,5),(4,6),(5,6)]:line(d,pts[a],pts[b],stage>=2)
- for j,(x,y) in enumerate(pts):
-  dot(d,x,y,12,ACC if stage>=2 else EDGE)
-  txt(d,x,y,str(j),12,BG,'mm')
- txt(d,494,151,'Schematic state graph',15,WHITE,'mm')
- line(d,(625,254),(691,254),stage>=3)
- if stage==3:pulse(d,(625,254),(691,254),frac)
- box(d,691,145,274,220,'Generated output','Rholang + machine model',stage>=3)
- for j,s in enumerate(['contract.rho','  private state token','  role capabilities','  version check','machine.json']):
-  txt(d,712,215+j*25,s,16,ACC if j in (0,4) else MUTED)
- footer(d,['01 / DECLARE','02 / EXPLORE','03 / CHECK','04 / EMIT'][stage],['Resources, roles, guards, invariants and goals.','Enumerate the reachable finite model.','Reject a reachable violation of a declared invariant.','Generate Rholang and the corresponding machine description.'][stage])
+ im=Image.new('RGB',(1000,440),'#121525');d=ImageDraw.Draw(im)
+ white='#ecf2ff';blue='#91b7ff';muted='#8c98b7';green='#9be5b4'
+ text(d,30,20,'RHO FOUNDRY',15,blue,kind='mono')
+ text(d,30,49,'Write the rules. Get a contract.',33,white)
+ d.rounded_rectangle((30,113,430,370),radius=8,fill='#1b2035',outline='#3c4664')
+ d.rounded_rectangle((570,113,970,370),radius=8,fill='#1b2035',outline='#3c4664')
+ d.rectangle((31,114,429,146),fill='#292f48');d.rectangle((571,114,969,146),fill='#292f48')
+ text(d,47,122,'reservation.json',15,blue,kind='mono');text(d,587,122,'contract.rho',15,green,kind='mono')
+ left=['3 seats','free + held + sold = 3','agent can hold and buy','goal: all 3 sold']
+ right=['private state','role capabilities','expected version check','sellout transition','+ machine.json']
+ for j,s in enumerate(left):
+  text(d,51,166+j*39,s,20,white if i>=j*5 else '#41495e',kind='mono')
+ # Actual finite reservation graph: each pair (held,sold) has free=3-held-sold.
+ coords={(h,s):(462+s*25,311-h*43-s*12) for s in range(4) for h in range(4-s)}
+ for (h,s),a in coords.items():
+  for q in ((h+1,s),(h-1,s),(h-1,s+1)):
+   if q in coords:line(d,a,coords[q],blue if i>=20 else '#39445c',1)
+ for j,(q,(x,y)) in enumerate(coords.items()):
+  circle(d,x,y,4,green if i>=20 and q==(0,3) else blue if i>=20+j else '#39445c')
+ text(d,504,337,'10 states',12,muted,'mm','mono')
+ for j,s in enumerate(right):
+  n=max(0,min(len(s),(i-23-j*3)*3))
+  text(d,592,166+j*35,s[:n],19,green if j in (3,4) else white,kind='mono')
+ if i>=39:
+  text(d,591,340,'Generated from the model.',14,muted)
+ text(d,30,396,'3 seats. No fourth seat. The rules become executable.',18,blue)
  return im
-fn={'observer':observer,'weave':weave,'forge':forge,'foundry':foundry}[P]
+fn={'observer':obs,'weave':weave,'forge':forge,'foundry':foundry}[project]
 frames=[fn(i) for i in range(48)]
-# Palette quantization, slow readable motion, no flashing.
-frames[0].save(out/'overview.gif',save_all=True,append_images=frames[1:],duration=130,loop=0,optimize=True,disposal=2)
+# Keep the last state readable before looping. No rapid flashing.
+frames[0].save(out/'overview.gif',save_all=True,append_images=frames[1:],duration=[110]*47+[1800],loop=0,optimize=True,disposal=2)
 frames[-1].save(out/'overview.png',optimize=True)
-with Image.open(out/'overview.gif') as im:assert im.n_frames>20 and im.size==(W,H)
-print(P, (out/'overview.gif').stat().st_size, 'bytes')
+with Image.open(out/'overview.gif') as im:
+ assert im.n_frames>20 and im.size==(1000,440)
+ print(project,im.n_frames,(out/'overview.gif').stat().st_size)

@@ -1,11 +1,11 @@
 # Motion graphics
 
-The overview is an illustrative, locally generated looping GIF, not live data. [Static version](overview.png).
+An illustrated example, not live telemetry. [Static image](overview.png).
 
-To regenerate, install Pillow in an isolated Python environment and run:
+Regenerate with Python and Pillow in an isolated environment:
 
 ```sh
 python docs/motion/render.py weave docs/motion /path/to/font-directory
 ```
 
-The font directory must contain Roboto-Regular.ttf or DejaVuSans.ttf. No font files are bundled. The diagrams are not part of the product runtime or CI.
+Fonts are selected from Roboto or DejaVu families, with serif and monospace alternatives when available. No font files are distributed. The animation generator is optional documentation tooling, not a product dependency.
