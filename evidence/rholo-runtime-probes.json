@@ -1,0 +1,373 @@
+{
+  "compiler_sha256": "c8ffc6259c60c28aef600abf7c81aa30ba86016a6d6d76285adeb47fb8bd1ec2",
+  "engine_sha256": "5a63d4e17a419a7bfdb4fb5bb2442183476705939e3301f16ac8e1bbe0752af2",
+  "binary_sha256": "232d12bd5d3fadc8371c26ec6a888ea48a4062b1187bb63c35b9d19423f28ead",
+  "binary_commit": "e63b7e5a8ccfcc25ff64860ac989d95a748eaaca",
+  "runtime_version": "rnode 0.1.0 (e63b7e5a8ccfcc25ff64860ac989d95a748eaaca)",
+  "fixture_count": 10,
+  "repeats": 5,
+  "peer_count": 0,
+  "block_height_before": 1,
+  "block_height_after": 1,
+  "passed": true,
+  "fixtures": [
+    {
+      "fixture": "single",
+      "source": "@\"weave_ok\"!(Nil)",
+      "model_status": "WIN",
+      "expected": [
+        {
+          "weave_bad": 0,
+          "weave_ok": 1
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "fixture": "duplicate",
+      "source": "@\"weave_ok\"!(Nil) | @\"weave_ok\"!(Nil)",
+      "model_status": "WIN",
+      "expected": [
+        {
+          "weave_bad": 0,
+          "weave_ok": 2
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 2,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 2,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 2,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 2,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 2,
+          "weave_bad": 0
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "fixture": "private_comm",
+      "source": "new x in { x!(Nil) | for (_ <- x) { @\"weave_ok\"!(Nil) } }",
+      "model_status": "WIN",
+      "expected": [
+        {
+          "weave_bad": 0,
+          "weave_ok": 1
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "fixture": "atomic_join",
+      "source": "new x,y in { x!(Nil) | y!(Nil) | for (_ <- x; _ <- y) { @\"weave_ok\"!(Nil) } }",
+      "model_status": "WIN",
+      "expected": [
+        {
+          "weave_bad": 0,
+          "weave_ok": 1
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "fixture": "same_channel_join",
+      "source": "new x in { x!(Nil) | x!(Nil) | for (_ <- x; _ <- x) { @\"weave_ok\"!(Nil) } }",
+      "model_status": "WIN",
+      "expected": [
+        {
+          "weave_bad": 0,
+          "weave_ok": 1
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "fixture": "scoped_names",
+      "source": "new x in { x!(Nil) | new x in { for (_ <- x) { @\"weave_bad\"!(Nil) } } | for (_ <- x) { @\"weave_ok\"!(Nil) } }",
+      "model_status": "WIN",
+      "expected": [
+        {
+          "weave_bad": 0,
+          "weave_ok": 1
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 0
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "fixture": "deadlock",
+      "source": "new x in { for (_ <- x) { @\"weave_ok\"!(Nil) } }",
+      "model_status": "NO_POLICY",
+      "expected": [
+        {
+          "weave_bad": 0,
+          "weave_ok": 0
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 0,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 0
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 0
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "fixture": "competing_receivers",
+      "source": "new x in { x!(Nil) | for (_ <- x) { @\"weave_ok\"!(Nil) } | for (_ <- x) { @\"weave_bad\"!(Nil) } }",
+      "model_status": "NO_POLICY",
+      "expected": [
+        {
+          "weave_bad": 0,
+          "weave_ok": 1
+        },
+        {
+          "weave_bad": 1,
+          "weave_ok": 0
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "fixture": "competing_join",
+      "source": "new x,y in { x!(Nil) | y!(Nil) | for (_ <- x; _ <- y) { @\"weave_ok\"!(Nil) } | for (_ <- x) { @\"weave_bad\"!(Nil) } }",
+      "model_status": "NO_POLICY",
+      "expected": [
+        {
+          "weave_bad": 0,
+          "weave_ok": 1
+        },
+        {
+          "weave_bad": 1,
+          "weave_ok": 0
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 0,
+          "weave_bad": 1
+        }
+      ],
+      "errors": [],
+      "passed": true
+    },
+    {
+      "fixture": "both_outputs",
+      "source": "@\"weave_ok\"!(Nil) | @\"weave_bad\"!(Nil)",
+      "model_status": "NO_POLICY",
+      "expected": [
+        {
+          "weave_bad": 1,
+          "weave_ok": 1
+        }
+      ],
+      "observed": [
+        {
+          "weave_ok": 1,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 1
+        },
+        {
+          "weave_ok": 1,
+          "weave_bad": 1
+        }
+      ],
+      "errors": [],
+      "passed": true
+    }
+  ]
+}

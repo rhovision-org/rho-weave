@@ -90,3 +90,7 @@ python rho-weave.pyz compile examples/coherent-read.rho --input pin --input read
 ```
 
 The standalone Python zipapp uses only the standard library. Builds are deterministic, and the CLI can run outside the checkout. CI also verifies the pinned Quantum OS source digest and static extraction. No arbitrary upstream program is executed.
+
+## Real Rholo differential execution
+
+The offline compiler now has a reproducible differential harness against the pinned actual Rholo executable. Ten closed-fragment fixtures were executed five times each in a fresh standalone loopback devnet with synthetic keys, no peers, and unchanged block height. All 50 concrete observations belonged to the model's predicted sets. See [raw evidence](evidence/rholo-runtime-probes.json) and [reproduction instructions](docs/RUNTIME.md). This checks sampled runtime/model consistency, not exhaustive scheduler coverage or formal equivalence.
